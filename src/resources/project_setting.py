@@ -1,13 +1,12 @@
 import copy
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
+from models.setting import SettingModel
 from models.project import ProjectModel
-from models.user_project_map import UserProjectMap
 from models.project_setting_map import ProjectSettingMap
-from models.init_project_setting import InitProjectSettingModel
 
 
-class Project(Resource):
+class ProjectSetting(Resource):
   parser = reqparse.RequestParser()
   parser.add_argument('name',
                       type=str,
@@ -55,11 +54,13 @@ class Project(Resource):
     return project.json()
 
 
-class ProjectList(Resource):
+class ProjectSettingList(Resource):
 
     @jwt_required()
-    def get(self):
-      return {'projects': list(map(lambda x: x.json(), ProjectModel.get_projects_by_user_id(current_identity.id)))}
+    def get(self, project_id):
+      if len(ProjectModel.find_by_id(project_id)) == 0:
+        return {'message': 'Project not found'}, 404
+      return {'settings': list(map(lambda x: x.json(), SettingModel.get_settings_by_project_id(project_id)))}
 
 
 class NewProject(Resource):

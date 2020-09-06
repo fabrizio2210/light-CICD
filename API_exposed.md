@@ -47,7 +47,11 @@ Create new project
 
 All details of the project identified by id_project
 
-### /api/v1/project/<id_project>/settings/<id_setting> GET/POST (secured)
+### /api/v1/project/<id_project>/settings GET (secured)
+
+Retrieve all the settings of the id_project project
+
+### /api/v1/project/<id_project>/setting/<id_setting> GET/POST (secured)
 
 Retrieve and set a setting of the id_project project
 

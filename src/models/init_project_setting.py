@@ -21,7 +21,7 @@ class InitProjectSettingModel(db.Model):
     self.delete()
 
   @classmethod
-  def get_all(self):
+  def get_all(cls):
     return cls.find()
 
   @classmethod

@@ -99,7 +99,6 @@ class db:
       print("====== Start Query ======")
       print(create_obj)
       print(row)
-      print("======== End Query ======")
       connection = sqlite3.connect(db.db_file)
       cursor = connection.cursor()
       cursor.execute(create_obj, row)
@@ -110,6 +109,8 @@ class db:
       for col in attrs:
         if col[0] == 'id':
           self.id = cursor.lastrowid
+          print("rowid: %d" % self.id)
+      print("======== End Query ======")
 
     def delete(self):
       attrs = self.get_attrs()

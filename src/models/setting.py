@@ -16,6 +16,7 @@ class SettingModel(db.Model):
     self.name = name
     self.description = description
     self.default_value = default_value
+    self.value = value
     self.id = id
 
   def json(self):

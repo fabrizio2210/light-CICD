@@ -2,12 +2,12 @@ from db import db
 from models.project_environment_map import ProjectEnvironmentMap
 
 
-class SettingModel(db.Model):
+class EnvironmentModel(db.Model):
   id = db.Field(_type = "integer", primary_key =  True)
   name = db.Field(_type = "string")
   description = db.Field(_type = "string")
   value = db.Field(_type = "string")
-  __tablename__ = "settings"
+  __tablename__ = "environments"
 
   def __init__(self, id, name, value = None, description = None):
     if description == None:
