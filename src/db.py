@@ -91,17 +91,39 @@ class db:
       return res
 
     def save(self):
+      # Check if it is an update
+      use_id = False
+      class_attrs = self.__class__.get_class_attrs()
+      for col in class_attrs:
+        if col[1].primary_key and col[1]._type == "INTEGER":
+          id_value = getattr(self, col[0])
+          if id_value is not None:
+            id_col = col[0]
+            use_id = True
+      
       attrs = self.get_attrs()
       attrs.sort()
-      ph = "(" + ",".join(['?']*len(attrs)) + ")"
+      attrs = [ a for a in attrs if not use_id or not a[0] == id_col]
       row = (*[a[1] for a in attrs],)
-      create_obj = "INSERT INTO {table} VALUES {placeholder}".format(table=self.__tablename__, placeholder=ph)
+
+      # Build query for insertion
+      if use_id:
+        ph = ""
+        for attr in attrs:
+          ph +=  " %s = ?," % attr[0]
+        ph = ph.rstrip(',')
+        query = "UPDATE {table} SET {placeholder} WHERE {id_col} = {id_value}".format(table=self.__tablename__, placeholder=ph, id_col=id_col, id_value=id_value)
+      else:
+        ph = "(" + ",".join(['?']*len(attrs)) + ")"
+        query = "INSERT INTO {table} VALUES {placeholder}".format(table=self.__tablename__, placeholder=ph)
+
+      # Execution of the query
       print("====== Start Query ======")
-      print(create_obj)
+      print(query)
       print(row)
       connection = sqlite3.connect(db.db_file)
       cursor = connection.cursor()
-      cursor.execute(create_obj, row)
+      cursor.execute(query, row)
       connection.commit()
       connection.close()
 

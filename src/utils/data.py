@@ -32,6 +32,10 @@ def bootstrap():
   new_user.save()
   new_user = UserModel(id=None, username="fabrizio2", password="pwd2", admin=0)
   new_user.save()
+  new_user = UserModel(id=None, username="fabrizio4", password="pwd2", admin=0)
+  new_user.save()
+  new_user.username = "fabrizio3"
+  new_user.save()
 
   print(UserModel.find_by_username("jose"))
   print(UserModel.find_by_id(1))
