@@ -104,10 +104,12 @@ class db:
       cursor.execute(create_obj, row)
       connection.commit()
       connection.close()
-      # Dirty way to have new ID
-      # maybe it is better to read all the row
-      for col in attrs:
-        if col[0] == 'id':
+
+      # Update instance with new ID
+      class_attrs = self.__class__.get_class_attrs()
+      for col in class_attrs:
+        if col[1].primary_key and col[1]._type == "INTEGER":
+          setattr(self, col[0], cursor.lastrowid)
           self.id = cursor.lastrowid
           print("rowid: %d" % self.id)
       print("======== End Query ======")
@@ -121,12 +123,24 @@ class db:
       if len(attrs) == 0:
         print("Error: trying to drop table")
         return
-      print(attrs)
-      for arg in attrs:
-        print(arg)
-        query += " %s=? AND " % arg[0]
-        list_args.append(arg[1])
-      query += "1 = 1"
+
+      # Check if an ID exists
+      use_id = False
+      class_attrs = self.__class__.get_class_attrs()
+      for col in class_attrs:
+        if col[1].primary_key and col[1]._type == "INTEGER":
+          list_args.append(getattr(self, col[0]))
+          query += " %s=? " % col[0]
+          use_id = True
+
+      if not use_id:
+        print(attrs)
+        for arg in attrs:
+          print(arg)
+          query += " %s=? AND " % arg[0]
+          list_args.append(arg[1])
+        query += "1 = 1"
+
       print("====== Start Query ======")
       print(query)
       print(list_args)
