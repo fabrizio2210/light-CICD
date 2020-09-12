@@ -54,6 +54,14 @@ def bootstrap():
   new_main_setting = MainSettingModel("max_project_run_number", new_setting.id)
   new_main_setting.save()
 
+  new_setting = SettingModel(id=None, 
+                             name="name_default_container", 
+                             description = "Default container to use",
+                             default_value = "fabrizio2210/controller")
+  new_setting.save()
+  new_main_setting = MainSettingModel("name_default_container", new_setting.id)
+  new_main_setting.save()
+
 # Initial Project Settings
   new_setting = SettingModel(id=None, 
                              name="github_url", 

@@ -19,3 +19,7 @@ class UserProjectMap(db.Model):
   @classmethod
   def find_project_ids_by_user_id(cls, user_id):
     return cls.find(user_id=user_id)
+
+  @classmethod
+  def find_user_id_by_project_id(cls, project_id):
+    return cls.find(project_id=project_id)

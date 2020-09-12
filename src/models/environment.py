@@ -13,6 +13,7 @@ class EnvironmentModel(db.Model):
     if description == None:
       description ="" 
     self.name = name
+    self.value = value
     self.description = description
     self.id = id
 
@@ -30,7 +31,7 @@ class EnvironmentModel(db.Model):
     res = []
     env_ids = ProjectEnvironmentMap.find_environment_ids_by_project_id(project_id)
     for env_id in env_ids:
-      res.append(cls.find_by_id(env_id.setting_id)[0])
+      res.append(cls.find_by_id(env_id.environment_id)[0])
     return res
 
   @classmethod

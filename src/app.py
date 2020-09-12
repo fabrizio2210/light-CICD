@@ -6,6 +6,8 @@ from security import authenticate, identity
 from resources.user import UserRegister
 from resources.project import Project, ProjectList, NewProject
 from resources.project_setting import ProjectSettingList
+from resources.main_setting import MainSettingList, MainSetting
+from resources.environment import EnvironmentList, Environment, NewEnvironment
 from utils.networking import get_my_ip
 from utils.data import bootstrap
 
@@ -28,6 +30,11 @@ api.add_resource(ProjectSettingList, '/project/<int:project_id>/settings')
 api.add_resource(NewProject, '/new_project/<string:name>')
 api.add_resource(ProjectList, '/projects')
 api.add_resource(UserRegister, '/register')
+api.add_resource(MainSetting, '/setting/<int:id>')
+api.add_resource(MainSettingList, '/settings')
+api.add_resource(EnvironmentList, '/project/<int:project_id>/environments')
+api.add_resource(Environment, '/project/environment/<int:id>')
+api.add_resource(NewEnvironment, '/project/<int:project_id>/new_environment')
 
 if __name__ == '__main__':
   from db import db

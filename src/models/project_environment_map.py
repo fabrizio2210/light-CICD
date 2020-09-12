@@ -19,3 +19,7 @@ class ProjectEnvironmentMap(db.Model):
   @classmethod
   def find_environment_ids_by_project_id(cls, project_id):
     return cls.find(project_id=project_id)
+
+  @classmethod
+  def find_project_id_by_environment_id(cls, environment_id):
+    return cls.find(environment_id=environment_id)
