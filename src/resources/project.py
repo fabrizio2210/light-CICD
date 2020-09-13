@@ -112,7 +112,7 @@ class NewProject(Resource):
       done_settings.append(new_setting)
 
       # Associate the setting to the project
-      mapping_setting = ProjectSettingMap(project_id=project.id, setting_id=new_setting.id)
+      mapping_setting = ProjectSettingMap(project_id=project.id, setting_id=new_setting.id, name=new_setting.name)
       try:
         mapping_setting.save()
       except:

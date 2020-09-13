@@ -9,39 +9,64 @@ from models.user_project_map import UserProjectMap
 
 class Environment(Resource):
   parser = reqparse.RequestParser()
+  parser.add_argument('name',
+                      type=str,
+                      required=False,
+                      help="This field cannot be left blank!"
+                      )
   parser.add_argument('value',
                       type=str,
-                      required=True,
+                      required=False,
+                      help="This field cannot be left blank!"
+                      )
+  parser.add_argument('description',
+                      type=str,
+                      required=False,
                       help="This field cannot be left blank!"
                       )
 
   @jwt_required()
   def get(self, id):
-    env = EnvironmentModel.find_by_id(id)
-    if env:
-      return env[0].json()
+    envs = EnvironmentModel.find_by_id(id)
+    if envs:
+      return envs[0].json()
     return {'message': 'Environment not found'}, 404
 
   def delete(self, id):
-    env = EnvironmentModel.find_by_id(id)
-    project = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
-    owner_project = UserProjectMap.find_user_id_by_project_id(project[0].id)
+    # Check the owner
+    projects = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
+    owner_project = UserProjectMap.find_user_id_by_project_id(projects[0].id)
     if current_identity.id != owner_project[0].id:
       return {'message': "You must be the owner of the project"}, 403
-    if env:
-      env[0].delete_from_db()
+
+    # Delete from db
+    envs = EnvironmentModel.find_by_id(id)
+    if envs:
+      envs[0].delete_from_db()
       return {'message': 'Environment deleted.'}, 201
     return {'message': 'Environment not found.'}, 404
 
   def put(self, id):
-    data = Project.parser.parse_args()
-    project = ProjectModel.find_by_id(id)
-    if project:
-      project.name = data['name']
-    else:
-      project = ProjectModel(None, **data)
-    project.save_to_db()
-    return project.json()
+    # Check the owner
+    projects = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
+    owner_project = UserProjectMap.find_user_id_by_project_id(projects[0].id)
+    if current_identity.id != owner_project[0].id:
+      return {'message': "You must be the owner of the project"}, 403
+
+    # Update the db
+    envs = EnvironmentModel.find_by_id(id)
+    if envs:
+      data = Environment.parser.parse_args()
+      #TODO Can we iterate on the parameters?
+      if data.get('name', None):
+        env.name = data['name']
+      if data.get('value', None):
+        env.value = data['value']
+      if data.get('description', None):
+        env.description = data['description']
+      env.save_to_db()
+      return env.json()
+    return {'message': 'Environment not found.'}, 404
 
 
 class EnvironmentList(Resource):
@@ -79,14 +104,14 @@ class NewEnvironment(Resource):
 
   @jwt_required()
   def post(self, project_id):
-    project = ProjectModel.find_by_id(project_id)
-    if not project:
+    projects = ProjectModel.find_by_id(project_id)
+    if not projects:
       return {'message': "A project with id '{}' does not exist.".format(project_id)}, 404
     data = NewEnvironment.parser.parse_args()
 
     # Check if it is the owner
-    project_map = UserProjectMap.find_user_id_by_project_id(project_id)
-    if current_identity.id != project_map[0].user_id:
+    project_maps = UserProjectMap.find_user_id_by_project_id(project_id)
+    if current_identity.id != project_maps[0].user_id:
       return {'message': "You must be the owner of the project"}, 403
 
     # Create a new environment
@@ -98,7 +123,7 @@ class NewEnvironment(Resource):
       return {"message": "An error occurred inserting the env."}, 500
 
     # Map the env to the project
-    mapping_project = ProjectEnvironmentMap(project_id = project[0].id, environment_id = env.id)
+    mapping_project = ProjectEnvironmentMap(project_id = projects[0].id, environment_id = env.id)
     try:
       mapping_project.save_to_db()
     except:

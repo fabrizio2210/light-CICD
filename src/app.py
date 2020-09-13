@@ -5,7 +5,7 @@ from flask_jwt import JWT
 from security import authenticate, identity
 from resources.user import UserRegister
 from resources.project import Project, ProjectList, NewProject
-from resources.project_setting import ProjectSettingList
+from resources.project_setting import ProjectSetting, ProjectSettingList
 from resources.main_setting import MainSettingList, MainSetting
 from resources.environment import EnvironmentList, Environment, NewEnvironment
 from utils.networking import get_my_ip
@@ -27,6 +27,7 @@ jwt = JWT(app, authenticate, identity)  # /auth
 
 api.add_resource(Project, '/project/<int:id>')
 api.add_resource(ProjectSettingList, '/project/<int:project_id>/settings')
+api.add_resource(ProjectSetting, '/project/<int:project_id>/setting/<string:name>')
 api.add_resource(NewProject, '/new_project/<string:name>')
 api.add_resource(ProjectList, '/projects')
 api.add_resource(UserRegister, '/register')

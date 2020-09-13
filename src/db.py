@@ -128,12 +128,14 @@ class db:
       connection.close()
 
       # Update instance with new ID
-      class_attrs = self.__class__.get_class_attrs()
-      for col in class_attrs:
-        if col[1].primary_key and col[1]._type == "INTEGER":
-          setattr(self, col[0], cursor.lastrowid)
-          self.id = cursor.lastrowid
-          print("rowid: %d" % self.id)
+      # if it is a new insertion
+      if not use_id:
+        class_attrs = self.__class__.get_class_attrs()
+        for col in class_attrs:
+          if col[1].primary_key and col[1]._type == "INTEGER":
+            setattr(self, col[0], cursor.lastrowid)
+            self.id = cursor.lastrowid
+            print("rowid: %d" % self.id)
       print("======== End Query ======")
 
     def delete(self):
