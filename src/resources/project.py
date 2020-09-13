@@ -1,10 +1,8 @@
-import copy
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
 from models.project import ProjectModel
 from models.user_project_map import UserProjectMap
 from models.project_setting_map import ProjectSettingMap
-from models.init_project_setting import InitProjectSettingModel
 
 
 class Project(Resource):
@@ -92,38 +90,5 @@ class NewProject(Resource):
     except:
       project.delete_from_db()
       return {"message": "An error occurred mapping the user to the project."}, 500
-
-    # Create new settings from initial ones
-    init_settings = InitProjectSettingModel.get_all_settings()
-    done_settings = []
-    done_setting_mappings = []
-    for init_setting in init_settings:
-      new_setting = copy.copy(init_setting)
-      new_setting.id = None
-      try:
-        new_setting.save_to_db()
-      except:
-        project.delete_from_db()
-        mapping_user.delete_from_db()
-        for setting in done_settings:
-          setting.delete_from_db()
-        for setting_map in done_setting_mappings:
-          setting_map.delete_from_db()
-      done_settings.append(new_setting)
-
-      # Associate the setting to the project
-      mapping_setting = ProjectSettingMap(project_id=project.id, setting_id=new_setting.id, name=new_setting.name)
-      try:
-        mapping_setting.save()
-      except:
-        project.delete_from_db()
-        mapping_user.delete_from_db()
-        for setting in done_settings:
-          setting.delete_from_db()
-        for setting_map in done_setting_mappings:
-          setting_map.delete_from_db()
-        return {"message": "An error occurred mapping the settins to the project."}, 500
-        done_setting_mappings.append(mapping_setting)
-
 
     return project.json(), 201

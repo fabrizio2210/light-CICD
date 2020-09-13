@@ -24,21 +24,21 @@ class InitProjectSettingModel(db.Model):
   def get_all(cls):
     return cls.find()
 
-  @classmethod
-  def get_all_settings(cls):
-    res = []
-    m_settings = cls.get_all()
-    for m_setting in m_settings:
-      res.append(SettingModel.find_by_id(m_setting.setting_id)[0])
-    return res
-
-  @classmethod
-  def get_setting_by_name(cls, name):
-    res = []
-    m_settings = cls.find_by_name(name)
-    for m_setting in m_settings:
-      res.append(SettingModel.find_by_id(m_setting.setting_id)[0])
-    return res
+#  @classmethod
+#  def get_all_settings(cls):
+#    res = []
+#    m_settings = cls.get_all()
+#    for m_setting in m_settings:
+#      res.append(SettingModel.find_by_id(m_setting.setting_id)[0])
+#    return res
+#
+#  @classmethod
+#  def get_setting_by_name(cls, name):
+#    res = []
+#    m_settings = cls.find_by_name(name)
+#    for m_setting in m_settings:
+#      res.append(SettingModel.find_by_id(m_setting.setting_id)[0])
+#    return res
 
   @classmethod
   def find_by_id(cls, id):
@@ -47,3 +47,4 @@ class InitProjectSettingModel(db.Model):
   @classmethod
   def find_by_name(cls, name):
     return cls.find(name=name)
+

@@ -64,10 +64,10 @@ def bootstrap():
 
 # Initial Project Settings
   new_setting = SettingModel(id=None, 
-                             name="github_url", 
-                             description = "Github URL of the project")
+                             name="scm_url", 
+                             description = "Source Control Manager URL of the project")
   new_setting.save()
-  new_main_setting = InitProjectSettingModel("github_url", new_setting.id)
+  new_main_setting = InitProjectSettingModel(new_setting.name, new_setting.id)
   new_main_setting.save()
 
 ##############

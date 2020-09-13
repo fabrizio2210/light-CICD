@@ -1,5 +1,4 @@
 from db import db
-from models.project_environment_map import ProjectEnvironmentMap
 
 
 class EnvironmentModel(db.Model):
@@ -25,14 +24,6 @@ class EnvironmentModel(db.Model):
 
   def delete_from_db(self):
     self.delete()
-
-  @classmethod
-  def get_environments_by_project_id(cls, project_id):
-    res = []
-    env_ids = ProjectEnvironmentMap.find_environment_ids_by_project_id(project_id)
-    for env_id in env_ids:
-      res.append(cls.find_by_id(env_id.environment_id)[0])
-    return res
 
   @classmethod
   def find_by_id(cls, id):

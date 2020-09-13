@@ -81,7 +81,7 @@ class EnvironmentList(Resource):
     if current_identity.id != project_map[0].user_id:
       return {'message': "You must be the owner of the project"}, 403
 
-    return {'environments': list(map(lambda x: x.json(), EnvironmentModel.get_environments_by_project_id(project_id)))}
+    return {'environments': list(map(lambda x: x.json(), ProjectEnvironmentMap.get_environments_by_project_id(project_id)))}
 
 
 class NewEnvironment(Resource):
@@ -113,6 +113,10 @@ class NewEnvironment(Resource):
     project_maps = UserProjectMap.find_user_id_by_project_id(project_id)
     if current_identity.id != project_maps[0].user_id:
       return {'message': "You must be the owner of the project"}, 403
+
+    # Check if the environment already exists
+    if ProjectEnvironmentMap.find_environment_id_by_project_and_name(project_id, name):
+      return {'message': "A variable with this name for this project already esists"}, 400
 
     # Create a new environment
     env = EnvironmentModel(name=data['name'], id=None, value=data.get('value', None), description=data.get('description', None))

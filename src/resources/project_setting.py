@@ -1,10 +1,10 @@
-import copy
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
 from models.setting import SettingModel
 from models.project import ProjectModel
 from models.project_setting_map import ProjectSettingMap
 from models.user_project_map import UserProjectMap
+from models.init_project_setting import InitProjectSettingModel
 
 
 class ProjectSetting(Resource):
@@ -24,20 +24,10 @@ class ProjectSetting(Resource):
     if owner_maps[0].user_id != current_identity.id:
       return {'message': "You have to own the project"}, 403
 
-    # find the setting,
-    setting = None
-    setting_maps = ProjectSettingMap.find_setting_ids_by_project_id_and_name(project_id, name)
-    if setting_maps:
-      settings = SettingModel.find_by_id(setting_maps[0].setting_id)
-      setting = settings[0]
-    else:
-      # if not found, clone by init setting
-      init_settings = InitProjectSettingModel.find_by_name(name)
-      if not init_settings:
-        return {'message': "The name of the setting does not exist"}, 400
-      settings = SettingModel.find_by_id(init_settings[0].setting_id)
-      setting = copy.copy(settings[0])
-      setting.id = None
+    # Get the setting (it can be new)
+    setting = ProjectSettingMap.get_project_setting_by_name(project_id, name)
+    if setting is None:
+      return {'message': "The name of the setting does not exist"}, 400
 
     return setting.json()
 
@@ -50,20 +40,13 @@ class ProjectSetting(Resource):
     if owner_maps[0].user_id != current_identity.id:
       return {'message': "You have to own the project"}, 403
 
-    # find the setting,
-    setting = None
-    setting_maps = ProjectSettingMap.find_setting_ids_by_project_id_and_name(project_id, name)
-    if setting_maps:
-      settings = SettingModel.find_by_id(setting_maps[0].setting_id)
-      setting = settings[0]
-    else:
-      # if not found, clone by init setting
-      init_settings = InitProjectSettingModel.find_by_name(name)
-      if not init_settings:
-        return {'message': "The name of the setting does not exist"}, 400
-      settings = SettingModel.find_by_id(init_settings[0].setting_id)
-      setting = copy.copy(settings[0])
-      setting.id = None
+    # Get the setting (it can be new)
+    setting = ProjectSettingMap.get_project_setting_by_name(project_id, name)
+    if setting is None: 
+      return {'message': "The name of the setting does not exist"}, 400
+    is_new_setting = False
+    if setting.id is None:
+      is_new_setting = True
 
     # Update fields
     data = ProjectSetting.parser.parse_args()
@@ -74,7 +57,7 @@ class ProjectSetting(Resource):
       return {'message': "An error occurred creating the setting"}, 500
 
     # Associate setting to the project, if new
-    if not setting_maps:
+    if is_new_setting:
       mapping_setting = ProjectSettingMap(project_id=project_id, setting_id=setting.id, name=setting.name)
       try:
         mapping_setting.save()
@@ -91,6 +74,6 @@ class ProjectSettingList(Resource):
     def get(self, project_id):
       if len(ProjectModel.find_by_id(project_id)) == 0:
         return {'message': 'Project not found'}, 404
-      return {'settings': list(map(lambda x: x.json(), SettingModel.get_settings_by_project_id(project_id)))}
+      return {'settings': list(map(lambda x: x.json(), ProjectSettingMap.get_settings_by_project_id(project_id)))}
 
 

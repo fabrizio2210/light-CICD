@@ -6,19 +6,19 @@
 
 Login web page, it is necessary to retrieve a security token 
 
-### /web/settings (secured)
+### /web/settings 
 
 Page where manipulate the overall settings
 
-### /web/projects (secured)
+### /web/projects 
 
 Page of all projects
 
-### /web/projects/<id_project>/ (secured)
+### /web/projects/<id_project>/ 
 
 Page of the project identified by id_project
 
-### /web/projects/<id_project>/settings (secured)
+### /web/projects/<id_project>/settings 
 
 Page where change the settings of the id_project project
 
@@ -26,14 +26,18 @@ Page where change the settings of the id_project project
 
 ## Backend API
 
+## Main Setting
 
 ### /api/v1/settings/ (secured)
 
 List of all settings
 
-### /api/v1/settings/<name_setting> GET/PUT (secured)
+### /api/v1/setting/<id_setting> GET/PUT (secured)
 
-Get or update name_setting general setting
+Get or update id_setting general setting
+
+
+## Project
 
 ### /api/v1/projects/ (secured)
 
@@ -47,13 +51,19 @@ Create new project
 
 All details of the project identified by id_project
 
+
+## Project Settings
+
 ### /api/v1/project/<id_project>/settings GET (secured)
 
 Retrieve all the settings of the id_project project
 
-### /api/v1/project/<id_project>/setting/<id_setting> GET/POST (secured)
+### /api/v1/project/<id_project>/setting/<name_setting> GET/PUT (secured)
 
 Retrieve and set a setting of the id_project project
+
+
+## Environment 
 
 ### /api/v1/project/<id_project>/environments GET (secured)
 
@@ -63,9 +73,12 @@ Get all environments of the id_project project
 
 Create a new environment the id_project project
 
-### /api/v1/project/<id_project>/environment/<id_environment> GET/PUT/DELETE (secured)
+### /api/v1/project/environment/<id_environment> GET/PUT/DELETE (secured)
 
 Retrieve and update an setting of the id_project project
+
+
+## Executions
 
 ### /api/v1/project/<id_project>/executions (secured)
 

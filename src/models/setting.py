@@ -1,5 +1,5 @@
+import copy
 from db import db
-from models.project_setting_map import ProjectSettingMap
 
 
 class SettingModel(db.Model):
@@ -29,17 +29,6 @@ class SettingModel(db.Model):
     self.delete()
 
   @classmethod
-  def get_settings_by_project_id(cls, project_id):
-    res = []
-    set_ids = ProjectSettingMap.find_setting_ids_by_project_id(project_id)
-    for set_id in set_ids:
-      res.append(cls.find_by_id(set_id.setting_id)[0])
-    return res
-
-  @classmethod
   def find_by_id(cls, id):
     return cls.find(id=id)
 
-  @classmethod
-  def find_by_name(cls, name):
-    return cls.find(name=name)
