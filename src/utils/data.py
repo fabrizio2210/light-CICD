@@ -55,9 +55,10 @@ def bootstrap():
   new_main_setting.save()
 
   new_setting = SettingModel(id=None, 
-                             name="name_default_container", 
-                             description = "Default container to use",
-                             default_value = "fabrizio2210/controller")
+                             name="name_default_container_image", 
+                             description = "Default container image to use",
+                             value = "samueldebruyn/debian-git",
+                             default_value = "debian")
   new_setting.save()
   new_main_setting = MainSettingModel("name_default_container", new_setting.id)
   new_main_setting.save()

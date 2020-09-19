@@ -80,10 +80,25 @@ Retrieve and update an setting of the id_project project
 
 ## Executions
 
-### /api/v1/project/<id_project>/executions (secured)
+### /api/v1/project/<id_project>/executions GET (secured)
 
 All the builds of the id_project project
+
+### /api/v1/project/<id_project>/execution/<id_execution> GET (secured)
+
+All the details of the id_execution execution
+
+### /api/v1/project/<id_project>/execution/<id_execution>/out/stdout|stderr GET (secured)
+
+Get the stderr or stdout of the id_execution execution
 
 ### /api/v1/project/<id_project>/build POST (secured)
 
 Trigger a build of the project id_project
+
+
+## External Integration
+
+### /api/v1/external/github_trigger POST
+
+It accepts a POST from GITHUB in order to trigger a build

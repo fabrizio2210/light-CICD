@@ -115,7 +115,7 @@ class NewEnvironment(Resource):
       return {'message': "You must be the owner of the project"}, 403
 
     # Check if the environment already exists
-    if ProjectEnvironmentMap.find_environment_id_by_project_and_name(project_id, name):
+    if ProjectEnvironmentMap.find_environment_id_by_project_and_name(project_id, data['name']):
       return {'message': "A variable with this name for this project already esists"}, 400
 
     # Create a new environment
@@ -127,7 +127,7 @@ class NewEnvironment(Resource):
       return {"message": "An error occurred inserting the env."}, 500
 
     # Map the env to the project
-    mapping_project = ProjectEnvironmentMap(project_id = projects[0].id, environment_id = env.id)
+    mapping_project = ProjectEnvironmentMap(name = data['name'], project_id = projects[0].id, environment_id = env.id)
     try:
       mapping_project.save_to_db()
     except:

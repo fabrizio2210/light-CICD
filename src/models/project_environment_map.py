@@ -5,6 +5,7 @@ from models.environment import EnvironmentModel
 class ProjectEnvironmentMap(db.Model):
   project_id = db.Field(_type = "integer")
   environment_id = db.Field(_type = "integer")
+  name = db.Field(_type = "string")
   __tablename__ = "project_environment_map"
 
   def __init__(self, project_id, environment_id, name):

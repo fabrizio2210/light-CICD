@@ -21,6 +21,12 @@
 /projects/<ID2>/name
 
 * The executions are read from filesystem by project ID *
+/executions/<project_id1>/<ID1>/start_time
+/executions/<project_id1>/<ID1>/settings
+/executions/<project_id1>/<ID1>/rc
+/executions/<project_id1>/<ID1>/stdout
+/executions/<project_id1>/<ID1>/stderr
+/executions/<project_id1>/<ID1>/stop_time
 
 *ID and name should be unique not changing*
 /settings/<ID1>/name
