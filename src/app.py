@@ -27,18 +27,18 @@ def initialization():
 
 jwt = JWT(app, authenticate, identity)  # /auth
 
-api.add_resource(Project, '/project/<int:id>')
-api.add_resource(ProjectSettingList, '/project/<int:project_id>/settings')
-api.add_resource(ProjectSetting, '/project/<int:project_id>/setting/<string:name>')
-api.add_resource(NewProject, '/new_project/<string:name>')
-api.add_resource(ProjectList, '/projects')
-api.add_resource(UserRegister, '/register')
-api.add_resource(MainSetting, '/setting/<int:id>')
-api.add_resource(MainSettingList, '/settings')
-api.add_resource(EnvironmentList, '/project/<int:project_id>/environments')
-api.add_resource(Environment, '/project/environment/<int:id>')
-api.add_resource(NewEnvironment, '/project/<int:project_id>/new_environment')
-api.add_resource(NewExecution, '/project/<int:project_id>/build')
+api.add_resource(Project, '/api/v1/project/<int:id>')
+api.add_resource(ProjectSettingList, '/api/v1/project/<int:project_id>/settings')
+api.add_resource(ProjectSetting, '/api/v1/project/<int:project_id>/setting/<string:name>')
+api.add_resource(NewProject, '/api/v1/new_project/<string:name>')
+api.add_resource(ProjectList, '/api/v1/projects')
+api.add_resource(UserRegister, '/api/v1/register')
+api.add_resource(MainSetting, '/api/v1/setting/<string:name>')
+api.add_resource(MainSettingList, '/api/v1/settings')
+api.add_resource(EnvironmentList, '/api/v1/project/<int:project_id>/environments')
+api.add_resource(Environment, '/api/v1/project/environment/<int:id>')
+api.add_resource(NewEnvironment, '/api/v1/project/<int:project_id>/new_environment')
+api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/build')
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO)

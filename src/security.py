@@ -3,11 +3,14 @@ from models.user import UserModel
 
 
 def authenticate(username, password):
-    user = UserModel.find_by_username(username)[0]
-    if user and safe_str_cmp(user.password, password):
-        return user
+    users = UserModel.find_by_username(username)
+    if users and safe_str_cmp(users[0].password, password):
+        return users[0]
 
 
 def identity(payload):
     user_id = payload['identity']
-    return UserModel.find_by_id(user_id)[0]
+    users = UserModel.find_by_id(user_id)
+    if users:
+      return users[0]
+    return None

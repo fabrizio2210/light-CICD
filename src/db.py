@@ -1,4 +1,5 @@
 import sqlite3
+import logging
 import inspect
 
 class db:
@@ -53,9 +54,9 @@ class db:
       ph = ph.rstrip(',')
       ph += ")"
       create_table = "CREATE TABLE IF NOT EXISTS {table} {placeholder}".format(table=cls.__tablename__, placeholder=ph)
-      print("====== Start Query ======")
-      print(create_table) 
-      print("======== End Query ======")
+      logging.debug("====== Start Query ======")
+      logging.debug(create_table) 
+      logging.debug("======== End Query ======")
       connection = sqlite3.connect(db.db_file)
       cursor = connection.cursor()
       cursor.execute(create_table)
@@ -72,10 +73,10 @@ class db:
         query += " %s=? AND " % arg
         list_args.append(kwargs[arg])
       query += "1 = 1"
-      print("====== Start Query ======")
-      print(query)
-      print(list_args)
-      print("======== End Query ======")
+      logging.debug("====== Start Query ======")
+      logging.debug(query)
+      logging.debug(list_args)
+      logging.debug("======== End Query ======")
       connection = sqlite3.connect(db.db_file)
       cursor = connection.cursor()
       result = cursor.execute(query, (*list_args,))
@@ -118,9 +119,9 @@ class db:
         query = "INSERT INTO {table} VALUES {placeholder}".format(table=self.__tablename__, placeholder=ph)
 
       # Execution of the query
-      print("====== Start Query ======")
-      print(query)
-      print(row)
+      logging.debug("====== Start Query ======")
+      logging.debug(query)
+      logging.debug(row)
       connection = sqlite3.connect(db.db_file)
       cursor = connection.cursor()
       cursor.execute(query, row)
@@ -135,8 +136,8 @@ class db:
           if col[1].primary_key and col[1]._type == "INTEGER":
             setattr(self, col[0], cursor.lastrowid)
             self.id = cursor.lastrowid
-            print("rowid: %d" % self.id)
-      print("======== End Query ======")
+            logging.debug("rowid: %d" % self.id)
+      logging.debug("======== End Query ======")
 
     def delete(self):
       attrs = self.get_attrs()
@@ -145,7 +146,7 @@ class db:
       query = "DELETE FROM {table} ".format(table=self.__tablename__)
       query += "WHERE "
       if len(attrs) == 0:
-        print("Error: trying to drop table")
+        logging.warning("Error: trying to drop table")
         return
 
       # Check if an ID exists
@@ -158,17 +159,15 @@ class db:
           use_id = True
 
       if not use_id:
-        print(attrs)
         for arg in attrs:
-          print(arg)
           query += " %s=? AND " % arg[0]
           list_args.append(arg[1])
         query += "1 = 1"
 
-      print("====== Start Query ======")
-      print(query)
-      print(list_args)
-      print("======== End Query ======")
+      logging.debug("====== Start Query ======")
+      logging.debug(query)
+      logging.debug(list_args)
+      logging.debug("======== End Query ======")
       connection = sqlite3.connect(db.db_file)
       cursor = connection.cursor()
       cursor.execute(query, (*list_args,))

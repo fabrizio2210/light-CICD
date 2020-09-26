@@ -12,23 +12,24 @@ class MainSetting(Resource):
                       )
 
   @jwt_required()
-  def get(self, id):
-    setting = MainSettingModel.find_by_id(id)
-    if setting:
-      return setting[0].json()
+  def get(self, name):
+    settings = MainSettingModel.get_setting_by_name(name)
+    if settings:
+      return settings[0].json()
     return {'message': 'Item not found'}, 404
 
-  def put(self, id):
+  @jwt_required()
+  def put(self, name):
     data = MainSetting.parser.parse_args()
     if current_identity.admin != 1:
       return {'message': "Admin privileges are required"}, 403
-    setting = MainSettingModel.find_by_id(id)
-    if setting:
-      setting[0].value = data['value']
+    settings = MainSettingModel.get_setting_by_name(name)
+    if settings:
+      settings[0].value = data['value']
     else:
       return {'message': "Setting not found"}, 404
-    setting.save_to_db()
-    return setting.json()
+    settings[0].save_to_db()
+    return settings[0].json()
 
 
 class MainSettingList(Resource):

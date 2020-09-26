@@ -37,10 +37,6 @@ def bootstrap():
   new_user.username = "fabrizio3"
   new_user.save()
 
-  print(UserModel.find_by_username("jose"))
-  print(UserModel.find_by_id(1))
-  print(UserModel.find_by_username("fabrizio"))
-  print(UserModel.get_all())
 
 ##########
 # Settings
