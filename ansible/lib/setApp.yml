@@ -30,11 +30,11 @@
     - name: Inserisci chiave gpg per Docker
       apt_key:
         id: 0EBFCD88
-        url: https://download.docker.com/linux/{{ansible_local.custom.ID_release}}/gpg
+        url: https://download.docker.com/linux/debian/gpg
         state: present
     - name :
       apt_repository:
-        repo: deb [arch=amd64 https://download.docker.com/linux/debian {{ansible_distribution_release}} stable
+        repo: deb [arch=amd64] https://download.docker.com/linux/debian buster stable
         state: present
     
     - name: installa pacchetti
@@ -44,7 +44,6 @@
         - curl
         - ca-certificates
         - apt-transport-https
-	- gnugp-agent
     
     - name: utente vagrant
       user:

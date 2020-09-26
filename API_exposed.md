@@ -32,7 +32,7 @@ Page where change the settings of the id_project project
 
 List of all settings
 
-### /api/v1/setting/<id_setting> GET/PUT (secured)
+### /api/v1/setting/<name_setting> GET/PUT (secured)
 
 Get or update id_setting general setting
 
