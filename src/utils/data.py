@@ -1,4 +1,3 @@
-import os
 from models.user import UserModel
 from models.setting import SettingModel
 from models.environment import EnvironmentModel
@@ -9,12 +8,11 @@ from models.project import ProjectModel
 from models.user_project_map import UserProjectMap
 from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
+from db import db
 
 
 def bootstrap():
-  if os.path.isfile("/tmp/data.db"):
-    os.unlink("/tmp/data.db")
-
+  db.delete_all()
   UserModel.create_table()
   UserProjectMap.create_table()
   ProjectModel.create_table()

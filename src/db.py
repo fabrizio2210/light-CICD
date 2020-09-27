@@ -1,13 +1,19 @@
 import sqlite3
 import logging
 import inspect
+import os
 
-class db:
+class db():
   db_file = "/tmp/data.db"
 
   @classmethod
   def create_tables(cls):
     pass
+
+  @classmethod
+  def delete_all(cls):
+    if os.path.isfile(cls.db_file):
+      os.unlink(cls.db_file)
   
   class Field():
     def __init__(self, _type = None, primary_key = None):
