@@ -28,7 +28,6 @@ class ProjectModel(db.Model):
   def get_projects_by_user_id(cls, user_id):
     res = []
     prj_ids = UserProjectMap.find_project_ids_by_user_id(user_id)
-    print(prj_ids)
     for prj_id in prj_ids:
       res.append(cls.find_by_id(prj_id.project_id)[0])
     return res

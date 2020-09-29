@@ -43,7 +43,7 @@ class ProjectSetting(Resource):
     # Get the setting (it can be new)
     setting = ProjectSettingMap.get_project_setting_by_name(project_id, name)
     if setting is None: 
-      return {'message': "The name of the setting does not exist"}, 400
+      return {'message': "The name of the setting does not exist"}, 404
     is_new_setting = False
     if setting.id is None:
       is_new_setting = True
