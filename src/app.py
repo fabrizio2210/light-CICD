@@ -20,10 +20,6 @@ app.secret_key = 'jose'
 api = Api(app)
 
 
-@app.before_first_request
-def initialization():
-  bootstrap()
-
 
 jwt = JWT(app, authenticate, identity)  # /auth
 
@@ -48,6 +44,7 @@ api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/build')
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO)
   logging.info('Started')
+  bootstrap()
   from db import db
   my_ip = get_my_ip()
   app.run(host=my_ip, port=5000, debug=True)
