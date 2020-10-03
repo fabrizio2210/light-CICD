@@ -274,37 +274,225 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
       "default_value": None })
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
 
-#    def test_get_device(self):
-#        name = "televisore"
-#        body = televisore
-#        rv = self.app.get('/device/{}'.format(name))
-#        self.assertEqual(rv.status, '200 OK')
-#        self.maxDiff = None
-#        dict_received = json.loads(rv.data.decode("utf-8"))
-#        self.assertEqual(dict_received['device']['name'], name)
-#        pairs = zip(dict_received['device']['keys'],body['keys'])
-#        same = any(x != y for x, y in pairs)
-#        self.assertEqual(same, True)
-#
-#    def test_get_remote_control(self):
-#        name = 'piano5'
-#        rv = self.app.get('/remote_control')
-#        self.assertEqual(rv.status, '200 OK')
-#        dict_received = json.loads(rv.data.decode("utf-8"))
-#        devices = ('televisore', 'stereo', 'proiettore')
-#        notfound = {}
-#        for device in devices:
-#          notfound[device] = True
-#        for x in dict_received['devices']:
-#          for device in devices:
-#            if x['name'] == device:
-#              notfound[device] = False
-#        self.assertEqual(any(notfound.values()), False)
-#
-#    def test_get_inexistent_item(self):
-#        name = 'piano6'
-#        rv = self.app.get('/item/{}'.format(name))
-#        self.assertEqual(rv.status, '404 NOT FOUND')
+##############################
+# Environment
+
+class TestAPI_EnvironmentAsUser(unittest.TestCase):
+
+  def setUp(self):
+    self.verificationErrors = []
+    app.app.testing = True
+    self.app = app.app.test_client()
+    initialize_test()
+    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
+
+  def tearDown(self):
+    self.assertEqual([], self.verificationErrors)
+
+      # GET             /api/v1/project/1/environments
+      # POST            /api/v1/project/1/new_environment
+  def test_050_get_environment_project(self):
+    prj_name = "my_prj_name"
+    prj_name2 = "my_prj_name2"
+    name = "MY_VARIABLE"
+    value = "MY_BEAUTIFUL_VARIABLE"
+    name2 = "MY_VARIABLE2"
+    value2 = "MY_BEAUTIFUL_VARIABLE2"
+    # Try to get environment of a non-existant project
+    rv = self.app.get('/api/v1/project/1/environments', headers = self.headers)
+    try: self.assertEqual(rv.status, '404 NOT FOUND')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Create first project
+    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    try: self.assertEqual(rv.status, '201 CREATED')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
+    except AssertionError as e: self.verificationErrors.append(str(e)) 
+    # Get all enviroments of the project
+    rv = self.app.get('/api/v1/project/1/environments', headers = self.headers)
+    try: self.assertEqual(rv.status, '200 OK')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environments" : [ ] })
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Post environment of first project
+    payload = { "name": name, "value": value }
+    rv = self.app.post('/api/v1/project/1/new_environment', json = payload, headers = self.headers)
+    try: self.assertEqual(rv.status, '201 CREATED')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), {
+      "id": 1, 
+      "description": None,
+      "value": value,
+      "name": name })
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Create second project 
+    rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
+    try: self.assertEqual(rv.status, '201 CREATED')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name2, "id": 2})
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Get all enviroments of the first project
+    rv = self.app.get('/api/v1/project/1/environments', headers = self.headers)
+    try: self.assertEqual(rv.status, '200 OK')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environments" : [
+    { "id": 1, 
+      "description": None,
+      "value": value,
+      "name": name } ] })
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Get all enviroments of the second project
+    rv = self.app.get('/api/v1/project/2/environments', headers = self.headers)
+    try: self.assertEqual(rv.status, '200 OK')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environments" : [ ] })
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+
+      # GET/PUT/DELETE  /api/v1/project/environment/1
+  def test_035_put_environment(self):
+    prj_name = "my_prj_name"
+    name = "MY_VARIABLE"
+    value = "MY_BEAUTIFUL_VARIABLE"
+    name2 = "MY_VARIABLE2"
+    value2 = "MY_BEAUTIFUL_VARIABLE2"
+    # Create project
+    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    try: self.assertEqual(rv.status, '201 CREATED')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Post environment
+    payload = { "name": name, "value": value }
+    rv = self.app.post('/api/v1/project/1/new_environment', json = payload, headers = self.headers)
+    try: self.assertEqual(rv.status, '201 CREATED')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": name, 
+      "id": 1, 
+      "description": None,
+      "value": value, })
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Try to modify as second user
+    rv = self.app.post('/auth', json = { "username": second_user, "password": second_password})
+    self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
+    payload = { "value": value2 }
+    rv = self.app.put('/api/v1/project/environment/1', json = payload, headers = self.headers)
+    try: self.assertEqual(rv.status, '403 FORBIDDEN')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Delete as first user
+    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
+    rv = self.app.delete('/api/v1/project/environment/1', headers = self.headers)
+    try: self.assertEqual(rv.status, '200 OK')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Get setting of first project as fisrt user
+    rv = self.app.get('/api/v1/project/environment/1', headers = self.headers)
+    try: self.assertEqual(rv.status, '404 NOT FOUND')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Put non existant environment of second project as first user
+    payload = { "value": value }
+    rv = self.app.put('/api/v1/project/environment/1', json = payload, headers = self.headers)
+    try: self.assertEqual(rv.status, '404 NOT FOUND')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Try to get setting of the second as first user
+    rv = self.app.get('/api/v1/project/environemnt/2', headers = self.headers)
+    try: self.assertEqual(rv.status, '404 NOT FOUND')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+
+
+##############################
+# Executions
+
+class TestAPI_ExecutionAsUser(unittest.TestCase):
+
+  def setUp(self):
+    self.verificationErrors = []
+    app.app.testing = True
+    self.app = app.app.test_client()
+    initialize_test()
+    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
+
+  def tearDown(self):
+    self.assertEqual([], self.verificationErrors)
+
+      # GET             /api/v1/project/1/executions
+      # POST            /api/v1/project/1/new_execution
+  def test_050_get_execution_project(self):
+    prj_name = "my_prj_name"
+    prj_name2 = "my_prj_name2"
+    name = "MY_VARIABLE"
+    value = "http;//github.com/fabrizio"
+    name2 = "MY_VARIABLE2"
+    value2 = "MY_BEAUTIFUL_VARIABLE2"
+    # Try to get execution of a non-existant project
+    rv = self.app.get('/api/v1/project/1/executions', headers = self.headers)
+    try: self.assertEqual(rv.status, '404 NOT FOUND')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Try to post execution of first project
+    rv = self.app.post('/api/v1/project/1/new_execution', json = {}, headers = self.headers)
+    try: self.assertEqual(rv.status, '404 NOT FOUND')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Create first project
+    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    try: self.assertEqual(rv.status, '201 CREATED')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
+    except AssertionError as e: self.verificationErrors.append(str(e)) 
+    # Put setting of first project
+    payload = { "value": value }
+    rv = self.app.put('/api/v1/project/1/setting/scm_url', json = payload, headers = self.headers)
+    try: self.assertEqual(rv.status, '200 OK')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Get all executions of the project
+    rv = self.app.get('/api/v1/project/1/executions', headers = self.headers)
+    try: self.assertEqual(rv.status, '200 OK')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "executions" : [ ] })
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Post execution of first project
+    rv = self.app.post('/api/v1/project/1/new_execution', json = {}, headers = self.headers)
+    try: self.assertEqual(rv.status, '201 CREATED')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    response = json.loads(rv.data.decode("utf-8"))
+    try: self.assertTrue(isinstance(response['id'], int))
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertTrue(response['project_id'] == 1)
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertTrue(response['settings'] == [])
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(response['environments'], [])
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertTrue(response['rc'] is None)
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertTrue(isinstance(response['start_time'], float))
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertTrue(response['stop_time'] is None)
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+
+#    # Create second project 
+#    rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
+#    try: self.assertEqual(rv.status, '201 CREATED')
+#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+#    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name2, "id": 2})
+#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+#    # Get all enviroments of the first project
+#    rv = self.app.get('/api/v1/project/1/environments', headers = self.headers)
+#    try: self.assertEqual(rv.status, '200 OK')
+#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+#    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environments" : [
+#    { "id": 1, 
+#      "description": None,
+#      "value": value,
+#      "name": name } ] })
+#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+#    # Get all enviroments of the second project
+#    rv = self.app.get('/api/v1/project/2/environments', headers = self.headers)
+#    try: self.assertEqual(rv.status, '200 OK')
+#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+#    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environments" : [ ] })
+#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.CRITICAL)

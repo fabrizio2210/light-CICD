@@ -1,6 +1,7 @@
 import subprocess
 import logging
 import random
+from datetime import datetime
 from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
 from models.main_setting import MainSettingModel
@@ -9,32 +10,35 @@ from models.environment import EnvironmentModel
 
 class ExecutionModel():
   id = None
-  stderr_url = None
-  stdout_url = None
   start_time = None
   rc = None
   stop_time = None
   settings = None
+  environments = None
   project_id = None
 
-  def __init__(self, project_id, id = None, stderr_url = None, stdout_url = None, start_time = None, rc = None, stop_time = None, settings = None):
-    if id is None:
-      id = ExecutionModel.getUniqueID()
+  def __init__(self, project_id, id = None, environments = None, start_time = None, rc = None, stop_time = None, settings = None):
+    if environments is None:
+      environments = []
+    if settings is None:
+      settings = []
     self.id = id
     self.project_id = project_id
-    self.stderr_url = stderr_url
-    self.stdout_url = stdout_url
     self.start_time = start_time
     self.rc = rc
     self.stop_time = stop_time
     self.settings = settings
+    self.environments = environments
+
+
+  def readFromFS(self):
+    pass
 
   def json(self):
-    return {'stderr_url': self.stderr_url,
-            'stdout_url': self.stdout_url, 
-            'id': self.id, 
+    return { 'id': self.id, 
             'project_id': self.project_id, 
             'settings': self.settings, 
+            'environments': self.environments, 
             'rc': self.rc, 
             'start_time': self.start_time, 
             'stop_time': self.stop_time}
@@ -44,9 +48,16 @@ class ExecutionModel():
     # Get information about the project
     scm_url = ProjectSettingMap.get_project_setting_by_name(self.project_id, "scm_url")
     if scm_url.value is None:
-      logging.warning("URL of the project not set")
-      return "URL of the project not set"
+      #TODO Raise error
+      logging.error("URL of the project not set")
+      raise ValueError("URL of the project not set")
     docker_images = MainSettingModel.get_setting_by_name("name_default_container")
+
+    # Initialization of the Execution
+    if self.id is not None:
+      raise ValueError("Not possible to rexecute the same execution")
+    self.id = ExecutionModel.getUniqueID(self.project_id)
+    self.start_time = datetime.now().timestamp()
 
     # Creation of the environment
     envs = ProjectEnvironmentMap.get_environments_by_project_id(self.project_id)
@@ -77,14 +88,14 @@ class ExecutionModel():
 
   @classmethod
   def find_executions_by_project_id(cls, project_id):
-    return None
+    return []
 
   @classmethod
   def find_by_id_and_project_id(cls, id, project_id):
     return None
 
   @classmethod
-  def getUniqueID(cls):
+  def getUniqueID(cls, project_id):
     #TODO implement unique ID
     return random.randrange(100000)
 

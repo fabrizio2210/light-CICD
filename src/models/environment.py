@@ -9,8 +9,6 @@ class EnvironmentModel(db.Model):
   __tablename__ = "environments"
 
   def __init__(self, id, name, value = None, description = None):
-    if description == None:
-      description ="" 
     self.name = name
     self.value = value
     self.description = description

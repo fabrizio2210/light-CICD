@@ -75,7 +75,7 @@ Create a new environment the id_project project
 
 ### /api/v1/project/environment/<id_environment> GET/PUT/DELETE (secured)
 
-Retrieve and update an setting of the id_project project
+Retrieve and update the id_environment environment of a project
 
 
 ## Executions
@@ -92,7 +92,7 @@ All the details of the id_execution execution
 
 Get the stderr or stdout of the id_execution execution
 
-### /api/v1/project/<id_project>/build POST (secured)
+### /api/v1/project/<id_project>/new_execution POST (secured)
 
 Trigger a build of the project id_project
 

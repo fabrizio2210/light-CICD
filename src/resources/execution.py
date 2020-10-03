@@ -55,8 +55,10 @@ class Execution(Resource):
 class ExecutionList(Resource):
 
     @jwt_required()
-    def get(self):
-      return {'projects': list(map(lambda x: x.json(), ProjectModel.get_projects_by_user_id(current_identity.id)))}
+    def get(self, project_id):
+      if len(ProjectModel.find_by_id(project_id)) == 0:
+        return {'message': 'Project not found'}, 404
+      return {'executions': list(map(lambda x: x.json(), ExecutionModel.find_executions_by_project_id(project_id)))}
 
 
 class NewExecution(Resource):
@@ -68,7 +70,6 @@ class NewExecution(Resource):
 
     # Create a new execution
     execution = ExecutionModel(project_id=project_id)
-    execution.exec()
     try:
       execution.exec()
     except Exception as e:

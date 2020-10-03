@@ -32,25 +32,27 @@ class Environment(Resource):
       return envs[0].json()
     return {'message': 'Environment not found'}, 404
 
+  @jwt_required()
   def delete(self, id):
     # Check the owner
-    projects = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
-    owner_project = UserProjectMap.find_user_id_by_project_id(projects[0].id)
-    if current_identity.id != owner_project[0].id:
+    project_maps = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
+    owner_project_maps = UserProjectMap.find_user_id_by_project_id(project_maps[0].project_id)
+    if current_identity.id != owner_project_maps[0].user_id:
       return {'message': "You must be the owner of the project"}, 403
 
     # Delete from db
     envs = EnvironmentModel.find_by_id(id)
     if envs:
       envs[0].delete_from_db()
-      return {'message': 'Environment deleted.'}, 201
+      return {'message': 'Environment deleted.'}, 200
     return {'message': 'Environment not found.'}, 404
 
+  @jwt_required()
   def put(self, id):
     # Check the owner
-    projects = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
-    owner_project = UserProjectMap.find_user_id_by_project_id(projects[0].id)
-    if current_identity.id != owner_project[0].id:
+    project_maps = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
+    owner_project_maps = UserProjectMap.find_user_id_by_project_id(project_maps[0].project_id)
+    if current_identity.id != owner_project_maps[0].user_id:
       return {'message': "You must be the owner of the project"}, 403
 
     # Update the db
