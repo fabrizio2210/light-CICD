@@ -45,22 +45,40 @@ def bootstrap():
                              description = "Number of executions per project that are stored",
                              default_value = 20)
   new_setting.save()
-  new_main_setting = MainSettingModel("max_project_run_number", new_setting.id)
+  new_main_setting = MainSettingModel(new_setting.name, new_setting.id)
   new_main_setting.save()
 
   new_setting = SettingModel(id=None, 
                              name="name_default_container_image", 
                              description = "Default container image to use",
-                             value = "samueldebruyn/debian-git",
+                             value = "fabrizio2210/docker_light-default_container",
                              default_value = "debian")
   new_setting.save()
-  new_main_setting = MainSettingModel("name_default_container", new_setting.id)
+  new_main_setting = MainSettingModel(new_setting.name, new_setting.id)
+  new_main_setting.save()
+
+  new_setting = SettingModel(id=None, 
+                             name="projects_dir", 
+                             description = "Directory where store projects",
+                             value = "/tmp",
+                             default_value = "/opt/data")
+  new_setting.save()
+  new_main_setting = MainSettingModel(new_setting.name, new_setting.id)
   new_main_setting.save()
 
 # Initial Project Settings
   new_setting = SettingModel(id=None, 
                              name="scm_url", 
                              description = "Source Control Manager URL of the project")
+  new_setting.save()
+  new_main_setting = InitProjectSettingModel(new_setting.name, new_setting.id)
+  new_main_setting.save()
+
+  new_setting = SettingModel(id=None, 
+                             name="image_use_docker", 
+                             value = True,
+                             default_value = True,
+                             description = "If the image use docker inside")
   new_setting.save()
   new_main_setting = InitProjectSettingModel(new_setting.name, new_setting.id)
   new_main_setting.save()

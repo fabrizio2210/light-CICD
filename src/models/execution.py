@@ -1,6 +1,7 @@
 import subprocess
 import logging
 import random
+from pathlib import Path
 from datetime import datetime
 from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
@@ -44,32 +45,58 @@ class ExecutionModel():
             'stop_time': self.stop_time}
 
   # Execute a run: creation of the environment, git clone, execution of CICD.sh(in container), make the output available
-  def exec(self):
+  def exec(self, manual = None):
     # Get information about the project
     scm_url = ProjectSettingMap.get_project_setting_by_name(self.project_id, "scm_url")
     if scm_url.value is None:
-      #TODO Raise error
       logging.error("URL of the project not set")
       raise ValueError("URL of the project not set")
-    docker_images = MainSettingModel.get_setting_by_name("name_default_container")
+
+    image_use_docker = ProjectSettingMap.get_project_setting_by_name(self.project_id, "image_use_docker")
+
+    # Get Main Settings
+    docker_images = MainSettingModel.get_setting_by_name("name_default_container_image")
+    if docker_images[0].value is None:
+      logging.error("Docker image is Null")
+      raise ValueError("Docker Image not set")
+    docker_image = docker_images[0]
+
+    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
+    if projects_dirs[0].value is None:
+      logging.error("The path where the projects are store is Null")
+      raise ValueError("Projects directory not set")
+    projects_dir = projects_dirs[0]
 
     # Initialization of the Execution
     if self.id is not None:
+      logging.error("The ID is already populated")
       raise ValueError("Not possible to rexecute the same execution")
     self.id = ExecutionModel.getUniqueID(self.project_id)
     self.start_time = datetime.now().timestamp()
 
     # Creation of the environment
     envs = ProjectEnvironmentMap.get_environments_by_project_id(self.project_id)
-    envs.append(EnvironmentModel(id=None, name="MANUAL_TRIGGER", value="1"))
+    if manual:
+      envs.append(EnvironmentModel(id=None, name="MANUAL_TRIGGER", value="1"))
     d_envs = []
     for env in envs:
       d_envs.append("--env")
       d_envs.append("{}={}".format(env.name, env.value))
 
+    if image_use_docker.value:
+      d_envs.append("-v")
+      d_envs.append("/var/run/docker.sock:/var/run/docker.sock")
+
+    # Creation of the directory structure
+    Path(projects_dir.value + "/" + str(self.project_id) + "/" + str(self.id)).mkdir(parents=True, exist_ok=True)
+
     # Creation of the output file
-    stdout_fh = open("stdout.out", "w")
-    stderr_fh = open("stderr.out", "w")
+    stdout_fh = open("{root_dir}/{prj}/{exc}/stdout".format(root_dir=projects_dir.value,
+    prj=self.project_id,
+    exc=self.id) , "w")
+    stderr_fh = open("{root_dir}/{prj}/{exc}/stderr".format(root_dir=projects_dir.value,
+    prj=self.project_id,
+    exc=self.id) , "w")
     #TODO close in the end
 
     # Creation of the internal command
