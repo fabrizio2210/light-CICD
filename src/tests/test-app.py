@@ -121,6 +121,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
   def setUp(self):
     self.verificationErrors = []
     app.app.testing = True
+    self.maxDiff = None
     self.app = app.app.test_client()
     initialize_test()
     rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
@@ -198,7 +199,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": "scm_url", 
-      "id": 4, 
+      "id": 6, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None })
@@ -249,7 +250,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": "scm_url", 
-      "id": 4, 
+      "id": 6, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None })
@@ -268,7 +269,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": "scm_url", 
-      "id": 4, 
+      "id": 6, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None })
@@ -422,7 +423,7 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     prj_name = "my_prj_name"
     prj_name2 = "my_prj_name2"
     name = "MY_VARIABLE"
-    value = "http;//github.com/fabrizio"
+    value = "https://github.com/fabrizio2210/web-infrared.git"
     name2 = "MY_VARIABLE2"
     value2 = "MY_BEAUTIFUL_VARIABLE2"
     # Try to get execution of a non-existant project
@@ -495,5 +496,5 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  logging.basicConfig(level=logging.CRITICAL)
+  logging.basicConfig(level=logging.INFO)
   unittest.main()

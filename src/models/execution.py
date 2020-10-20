@@ -1,13 +1,18 @@
 import subprocess
 import logging
 import random
+import signal
 from pathlib import Path
 from datetime import datetime
 from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
 from models.main_setting import MainSettingModel
 from models.environment import EnvironmentModel
+from shlex import quote
 
+def preexec_function():
+  # Ignore sighup signal
+  signal.signal(signal.SIGHUP, signal.SIG_IGN)
 
 class ExecutionModel():
   id = None
@@ -17,6 +22,7 @@ class ExecutionModel():
   settings = None
   environments = None
   project_id = None
+  project_dir_format = "{root_dir}/{prj}/{exc}"
 
   def __init__(self, project_id, id = None, environments = None, start_time = None, rc = None, stop_time = None, settings = None):
     if environments is None:
@@ -81,7 +87,7 @@ class ExecutionModel():
     d_envs = []
     for env in envs:
       d_envs.append("--env")
-      d_envs.append("{}={}".format(env.name, env.value))
+      d_envs.append(quote("{}={}".format(env.name, env.value)))
 
     if image_use_docker.value:
       d_envs.append("-v")
@@ -91,27 +97,33 @@ class ExecutionModel():
     Path(projects_dir.value + "/" + str(self.project_id) + "/" + str(self.id)).mkdir(parents=True, exist_ok=True)
 
     # Creation of the output file
-    stdout_fh = open("{root_dir}/{prj}/{exc}/stdout".format(root_dir=projects_dir.value,
+    stdout_fh = open(self.project_dir_format.format(root_dir=projects_dir.value,
     prj=self.project_id,
-    exc=self.id) , "w")
-    stderr_fh = open("{root_dir}/{prj}/{exc}/stderr".format(root_dir=projects_dir.value,
-    prj=self.project_id,
-    exc=self.id) , "w")
+    exc=self.id) + "/output" , "w")
     #TODO close in the end
 
     # Creation of the internal command
-    d_command = "cd $(mktemp -d); git clone {} ; cd * ; ./CICD.sh".format(scm_url.value)
-    command = ["docker", 
+    d_command = quote("cd $(mktemp -d); git clone {} ; cd * ; ./CICD.sh".format(quote(scm_url.value)))
+    command_array = ["docker", 
                       "run", 
                       *d_envs,
                       docker_images[0].value, 
                       "bash", 
                       "-c",
                       d_command]
+    command = " ".join(command_array) + "; echo $? > " + self.project_dir_format.format(root_dir=projects_dir.value,
+    prj=self.project_id,
+    exc=self.id) + "/rc"
     logging.info("Command executed: {}".format(repr(command)))
-    subprocess.Popen(command,
+    process = subprocess.Popen(command,
+                      shell = True,
+                      preexec_fn = preexec_function,
                       stdout = stdout_fh,
-                      stderr = stderr_fh)
+                      stderr = stdout_fh)
+    with open(self.project_dir_format.format(root_dir=projects_dir.value,
+    prj=self.project_id,
+    exc=self.id) + "/pid", "w") as f:
+      f.write(str(process.pid))
 
   @classmethod
   def find_executions_by_project_id(cls, project_id):
@@ -125,4 +137,5 @@ class ExecutionModel():
   def getUniqueID(cls, project_id):
     #TODO implement unique ID
     return random.randrange(100000)
+
 

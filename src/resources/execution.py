@@ -1,3 +1,4 @@
+import logging
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required, current_identity
 from models.execution import ExecutionModel
@@ -73,7 +74,7 @@ class NewExecution(Resource):
     try:
       execution.exec()
     except Exception as e:
-      print(e)
+      logging.error(e)
       return {"message": "An error occurred running the item."}, 500
 
     return execution.json(), 201
