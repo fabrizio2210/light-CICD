@@ -2,6 +2,7 @@ import unittest
 import logging
 import json
 import sys
+import warnings
 from os import path
 sys.path.append( path.dirname( path.dirname( path.abspath(__file__) ) ) )
 import app
@@ -33,6 +34,8 @@ class TestAPI_without_auth(unittest.TestCase):
     self.assertEqual(rv.status, '404 NOT FOUND')
 
   def test_020_get_token(self):
+    # An invalid credential raises an error in the log
+    logging.disable(logging.CRITICAL)
     logins = [ {"cred": { "username": admin_user, "password": admin_password}, "res": "200 OK"},
                { "cred": { "username": normal_user, "password": normal_password}, "res": "200 OK"},
                { "cred": { "username": "not_exist_s345ffsdg", "password": "not_exist"}, "res": "401 UNAUTHORIZED"},
@@ -40,6 +43,7 @@ class TestAPI_without_auth(unittest.TestCase):
     for login in logins:
       rv = self.app.post('/auth', json = login['cred'])
       self.assertEqual(rv.status, login['res'])
+    logging.disable(logging.NOTSET)
 
 
 ##############
@@ -410,11 +414,14 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     self.verificationErrors = []
     app.app.testing = True
     self.app = app.app.test_client()
+    # Creating a subshell and closing the application creates a ResourceWarning
+    warnings.simplefilter("ignore", ResourceWarning)
     initialize_test()
     rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
 
   def tearDown(self):
+    warnings.simplefilter("default", ResourceWarning)
     self.assertEqual([], self.verificationErrors)
 
       # GET             /api/v1/project/1/executions
@@ -496,5 +503,5 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  logging.basicConfig(level=logging.INFO)
+  logging.basicConfig(level=logging.ERROR)
   unittest.main()
