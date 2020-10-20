@@ -78,7 +78,10 @@ class ExecutionModel():
       logging.error("The ID is already populated")
       raise ValueError("Not possible to rexecute the same execution")
     self.id = ExecutionModel.getUniqueID(self.project_id)
-    self.start_time = datetime.now().timestamp()
+    self.start_time = int(datetime.now().timestamp())
+    project_dir = self.project_dir_format.format(root_dir=projects_dir.value,
+                  prj=self.project_id,
+                  exc=self.id)
 
     # Creation of the environment
     envs = ProjectEnvironmentMap.get_environments_by_project_id(self.project_id)
@@ -97,10 +100,11 @@ class ExecutionModel():
     Path(projects_dir.value + "/" + str(self.project_id) + "/" + str(self.id)).mkdir(parents=True, exist_ok=True)
 
     # Creation of the output file
-    stdout_fh = open(self.project_dir_format.format(root_dir=projects_dir.value,
-    prj=self.project_id,
-    exc=self.id) + "/output" , "w")
-    #TODO close in the end
+    stdout_fh = open(project_dir + "/output" , "w")
+
+    # Storing the start timestamp
+    with open(project_dir + "/start_time", "w") as f:
+      f.write(str(self.start_time))
 
     # Creation of the internal command
     d_command = quote("cd $(mktemp -d); git clone {} ; cd * ; ./CICD.sh".format(quote(scm_url.value)))
@@ -111,18 +115,20 @@ class ExecutionModel():
                       "bash", 
                       "-c",
                       d_command]
-    command = " ".join(command_array) + "; echo $? > " + self.project_dir_format.format(root_dir=projects_dir.value,
-    prj=self.project_id,
-    exc=self.id) + "/rc"
+    command = " ".join(command_array) + \
+              "; echo $?  > " + project_dir + "/rc " + \
+              "; date +%s > " + project_dir + "/stop_time"
+
+    # Execution
     logging.info("Command executed: {}".format(repr(command)))
     process = subprocess.Popen(command,
                       shell = True,
                       preexec_fn = preexec_function,
                       stdout = stdout_fh,
                       stderr = stdout_fh)
-    with open(self.project_dir_format.format(root_dir=projects_dir.value,
-    prj=self.project_id,
-    exc=self.id) + "/pid", "w") as f:
+
+    # Saving the PID
+    with open(project_dir + "/pid", "w") as f:
       f.write(str(process.pid))
 
   @classmethod

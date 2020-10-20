@@ -473,7 +473,7 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertTrue(response['rc'] is None)
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertTrue(isinstance(response['start_time'], float))
+    try: self.assertTrue(isinstance(response['start_time'], int))
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertTrue(response['stop_time'] is None)
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 

@@ -67,7 +67,8 @@ class NewExecution(Resource):
   @jwt_required()
   def post(self, project_id):
     if not ProjectModel.find_by_id(project_id):
-      return {'message': "A project with id '{}' does not exist.".format(project_id)}, 404
+      return {'message': 
+              "A project with id '{}' does not exist.".format(project_id)}, 404
 
     # Create a new execution
     execution = ExecutionModel(project_id=project_id)
