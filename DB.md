@@ -24,8 +24,7 @@
 /executions/<project_id1>/<ID1>/start_time
 /executions/<project_id1>/<ID1>/settings
 /executions/<project_id1>/<ID1>/rc
-/executions/<project_id1>/<ID1>/stdout
-/executions/<project_id1>/<ID1>/stderr
+/executions/<project_id1>/<ID1>/output
 /executions/<project_id1>/<ID1>/stop_time
 
 *ID and name should be unique not changing*
