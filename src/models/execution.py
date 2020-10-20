@@ -2,6 +2,7 @@ import subprocess
 import logging
 import random
 import signal
+import json
 from pathlib import Path
 from datetime import datetime
 from models.project_environment_map import ProjectEnvironmentMap
@@ -20,22 +21,20 @@ class ExecutionModel():
   rc = None
   stop_time = None
   settings = None
-  environments = None
+  commandline = None
   project_id = None
   project_dir_format = "{root_dir}/{prj}/{exc}"
 
-  def __init__(self, project_id, id = None, environments = None, start_time = None, rc = None, stop_time = None, settings = None):
-    if environments is None:
-      environments = []
+  def __init__(self, project_id, id = None, commandline = None, start_time = None, rc = None, stop_time = None, settings = None):
     if settings is None:
-      settings = []
+      settings = {}
     self.id = id
     self.project_id = project_id
     self.start_time = start_time
     self.rc = rc
     self.stop_time = stop_time
     self.settings = settings
-    self.environments = environments
+    self.commandline = commandline
 
 
   def readFromFS(self):
@@ -44,34 +43,36 @@ class ExecutionModel():
   def json(self):
     return { 'id': self.id, 
             'project_id': self.project_id, 
-            'settings': self.settings, 
-            'environments': self.environments, 
+            'settings': list(map(lambda x: self.settings[x].json(), self.settings)), 
+            'commandline': self.commandline, 
             'rc': self.rc, 
             'start_time': self.start_time, 
             'stop_time': self.stop_time}
 
   # Execute a run: creation of the environment, git clone, execution of CICD.sh(in container), make the output available
   def exec(self, manual = None):
-    # Get information about the project
-    scm_url = ProjectSettingMap.get_project_setting_by_name(self.project_id, "scm_url")
+    # Get Main Settings and Project Settings
+    main_settings = MainSettingModel.get_all_settings()
+    project_settings = ProjectSettingMap.get_settings_by_project_id(self.project_id)
+    self.settings = { s.name: s for s in main_settings + project_settings }
+
+    # Checking informations
+    scm_url = self.settings.get("scm_url")
     if scm_url.value is None:
       logging.error("URL of the project not set")
       raise ValueError("URL of the project not set")
 
-    image_use_docker = ProjectSettingMap.get_project_setting_by_name(self.project_id, "image_use_docker")
+    image_use_docker = self.settings.get("image_use_docker")
 
-    # Get Main Settings
-    docker_images = MainSettingModel.get_setting_by_name("name_default_container_image")
-    if docker_images[0].value is None:
+    docker_image = self.settings.get("name_default_container_image", None)
+    if docker_image.value is None:
       logging.error("Docker image is Null")
       raise ValueError("Docker Image not set")
-    docker_image = docker_images[0]
 
-    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
-    if projects_dirs[0].value is None:
+    projects_dir = self.settings.get("projects_dir", None)
+    if projects_dir.value is None:
       logging.error("The path where the projects are store is Null")
       raise ValueError("Projects directory not set")
-    projects_dir = projects_dirs[0]
 
     # Initialization of the Execution
     if self.id is not None:
@@ -102,26 +103,30 @@ class ExecutionModel():
     # Creation of the output file
     stdout_fh = open(project_dir + "/output" , "w")
 
-    # Storing the start timestamp
-    with open(project_dir + "/start_time", "w") as f:
-      f.write(str(self.start_time))
-
     # Creation of the internal command
     d_command = quote("cd $(mktemp -d); git clone {} ; cd * ; ./CICD.sh".format(quote(scm_url.value)))
     command_array = ["docker", 
                       "run", 
                       *d_envs,
-                      docker_images[0].value, 
+                      docker_image.value, 
                       "bash", 
                       "-c",
                       d_command]
-    command = " ".join(command_array) + \
+    self.commandline = " ".join(command_array) + \
               "; echo $?  > " + project_dir + "/rc " + \
               "; date +%s > " + project_dir + "/stop_time"
 
+    # Storing the execution information
+    with open(project_dir + "/start_time", "w") as f:
+      f.write(str(self.start_time))
+    with open(project_dir + "/settings", "w") as f:
+      json.dump(list(map(lambda x: self.settings[x].json(), self.settings)), f, indent = 6)
+    with open(project_dir + "/commandline", "w") as f:
+      f.write(str(self.commandline))
+
     # Execution
-    logging.info("Command executed: {}".format(repr(command)))
-    process = subprocess.Popen(command,
+    logging.info("Command executed: {}".format(repr(self.commandline)))
+    process = subprocess.Popen(self.commandline,
                       shell = True,
                       preexec_fn = preexec_function,
                       stdout = stdout_fh,
@@ -137,8 +142,29 @@ class ExecutionModel():
 
   @classmethod
   def find_by_id_and_project_id(cls, id, project_id):
-    return None
+    executions = []
+    project_dir = self.project_dir_format.format(root_dir=projects_dir.value,
+                  prj=self.project_id,
+                  exc=self.id)
+    if Path(project_dir).is_dir():
+      execution = ExecutionModel(project_id = project_id, 
+              id = id,
+              rc = int(cls.readAttribute("rc")),
+              start_time = int(cls.readAttribute("start_time")),
+              stop_time = int(cls.readAttribute("stop_time")),
+              settings = json.loads(cls.readAttribute("settings")),
+              commandline = json.loads(cls.readAttribute("commandline"))
+        )
+      executions.append(execution)
+    return executions
 
+  @classmethod
+  def readAttribute(project_dir, attr):
+      if Path(project_dir + "/" + attr).is_file():
+        with open(project_dir + "/" + attr, "r"):
+          return f.read().rstrip()
+      return None
+    
   @classmethod
   def getUniqueID(cls, project_id):
     #TODO implement unique ID
