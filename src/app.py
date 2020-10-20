@@ -43,7 +43,7 @@ api.add_resource(ExecutionList, '/api/v1/project/<int:project_id>/executions')
 api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 
 if __name__ == '__main__':
-  logging.basicConfig(level=logging.INFO)
+  logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
   logging.info('Started')
   bootstrap()
   from db import db
