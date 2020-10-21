@@ -40,6 +40,7 @@ api.add_resource(EnvironmentList, '/api/v1/project/<int:project_id>/environments
 api.add_resource(NewEnvironment,  '/api/v1/project/<int:project_id>/new_environment')
 
 api.add_resource(ExecutionList, '/api/v1/project/<int:project_id>/executions')
+api.add_resource(Execution, '/api/v1/project/<int:project_id>/execution/<int:id>')
 api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 
 if __name__ == '__main__':

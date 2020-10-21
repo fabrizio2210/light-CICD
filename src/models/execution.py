@@ -9,6 +9,7 @@ from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
 from models.main_setting import MainSettingModel
 from models.environment import EnvironmentModel
+from models.setting import SettingModel
 from shlex import quote
 
 def preexec_function():
@@ -120,7 +121,8 @@ class ExecutionModel():
     with open(project_dir + "/start_time", "w") as f:
       f.write(str(self.start_time))
     with open(project_dir + "/settings", "w") as f:
-      json.dump(list(map(lambda x: self.settings[x].json(), self.settings)), f, indent = 6)
+      json.dump({ self.settings[s].name: 
+                  self.settings[s].json() for s in self.settings }, f, indent = 6)
     with open(project_dir + "/commandline", "w") as f:
       f.write(str(self.commandline))
 
@@ -143,25 +145,40 @@ class ExecutionModel():
   @classmethod
   def find_by_id_and_project_id(cls, id, project_id):
     executions = []
-    project_dir = self.project_dir_format.format(root_dir=projects_dir.value,
-                  prj=self.project_id,
-                  exc=self.id)
+    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
+    project_dir = cls.project_dir_format.format(root_dir=projects_dirs[0].value,
+                  prj=project_id,
+                  exc=id)
     if Path(project_dir).is_dir():
+      try:
+        rc = int(cls.readAttribute(project_dir, "rc"))
+      except:
+        rc = None
+      start_time = int(cls.readAttribute(project_dir, "start_time"))
+      try:
+        stop_time = int(cls.readAttribute(project_dir, "stop_time"))
+      except:
+        stop_time = None
+      j_settings = json.loads(cls.readAttribute(project_dir, "settings"))
+      settings = {}
+      for s in j_settings:
+        settings[s] = SettingModel(**j_settings[s])
+        
+      commandline = cls.readAttribute(project_dir, "commandline")
       execution = ExecutionModel(project_id = project_id, 
               id = id,
-              rc = int(cls.readAttribute("rc")),
-              start_time = int(cls.readAttribute("start_time")),
-              stop_time = int(cls.readAttribute("stop_time")),
-              settings = json.loads(cls.readAttribute("settings")),
-              commandline = json.loads(cls.readAttribute("commandline"))
-        )
+              rc = rc,
+              start_time = start_time,
+              stop_time = stop_time,
+              settings = settings,
+              commandline = commandline)
       executions.append(execution)
     return executions
 
   @classmethod
-  def readAttribute(project_dir, attr):
+  def readAttribute(cls, project_dir, attr):
       if Path(project_dir + "/" + attr).is_file():
-        with open(project_dir + "/" + attr, "r"):
+        with open(project_dir + "/" + attr, "r") as f:
           return f.read().rstrip()
       return None
     
