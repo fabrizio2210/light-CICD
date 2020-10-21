@@ -88,13 +88,24 @@ All the builds of the id_project project
 
 All the details of the id_execution execution
 
-### /api/v1/project/<id_project>/execution/<id_execution>/out/stdout|stderr GET (secured)
-
-Get the stderr or stdout of the id_execution execution
-
 ### /api/v1/project/<id_project>/new_execution POST (secured)
 
 Trigger a build of the project id_project
+
+### /api/v1/project/<id_project>/execution/<id_execution>/output GET (secured)
+
+Get the stderr plus stdout of the id_execution execution
+req: {
+        first_requested_byte: 512,
+        last_requested_byte: 1024,
+     }
+
+res: {
+        first_transmitted_byte: 512,
+        last_transmitted_byte: 1024,
+        file_bytes: 2234,
+        data : "@@@@@@@@@@@"
+     }
 
 
 ## External Integration
