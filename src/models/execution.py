@@ -1,9 +1,11 @@
 import subprocess
+import os
 import logging
 import random
 import signal
 import json
-from pathlib import Path
+import shutil
+from pathlib import Path, PurePath
 from datetime import datetime
 from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
@@ -24,7 +26,8 @@ class ExecutionModel():
   settings = None
   commandline = None
   project_id = None
-  project_dir_format = "{root_dir}/{prj}/{exc}"
+  project_dir_format = "{root_dir}/{prj}"
+  exec_dir_format    = "{root_dir}/{prj}/{exc:0>20}"
 
   def __init__(self, project_id, id = None, commandline = None, start_time = None, rc = None, stop_time = None, settings = None):
     if settings is None:
@@ -81,7 +84,7 @@ class ExecutionModel():
       raise ValueError("Not possible to rexecute the same execution")
     self.id = ExecutionModel.getUniqueID(self.project_id)
     self.start_time = int(datetime.now().timestamp())
-    project_dir = self.project_dir_format.format(root_dir=projects_dir.value,
+    exec_dir = self.exec_dir_format.format(root_dir=projects_dir.value,
                   prj=self.project_id,
                   exc=self.id)
 
@@ -99,10 +102,10 @@ class ExecutionModel():
       d_envs.append("/var/run/docker.sock:/var/run/docker.sock")
 
     # Creation of the directory structure
-    Path(projects_dir.value + "/" + str(self.project_id) + "/" + str(self.id)).mkdir(parents=True, exist_ok=True)
+    Path(exec_dir).mkdir(parents=True, exist_ok=True)
 
     # Creation of the output file
-    stdout_fh = open(project_dir + "/output" , "w")
+    stdout_fh = open(exec_dir + "/output" , "w")
 
     # Creation of the internal command
     d_command = quote("cd $(mktemp -d); git clone {} ; cd * ; ./CICD.sh".format(quote(scm_url.value)))
@@ -114,16 +117,16 @@ class ExecutionModel():
                       "-c",
                       d_command]
     self.commandline = " ".join(command_array) + \
-              "; echo $?  > " + project_dir + "/rc " + \
-              "; date +%s > " + project_dir + "/stop_time"
+              "; echo $?  > " + exec_dir + "/rc " + \
+              "; date +%s > " + exec_dir + "/stop_time"
 
     # Storing the execution information
-    with open(project_dir + "/start_time", "w") as f:
+    with open(exec_dir + "/start_time", "w") as f:
       f.write(str(self.start_time))
-    with open(project_dir + "/settings", "w") as f:
+    with open(exec_dir + "/settings", "w") as f:
       json.dump({ self.settings[s].name: 
                   self.settings[s].json() for s in self.settings }, f, indent = 6)
-    with open(project_dir + "/commandline", "w") as f:
+    with open(exec_dir + "/commandline", "w") as f:
       f.write(str(self.commandline))
 
     # Execution
@@ -135,36 +138,44 @@ class ExecutionModel():
                       stderr = stdout_fh)
 
     # Saving the PID
-    with open(project_dir + "/pid", "w") as f:
+    with open(exec_dir + "/pid", "w") as f:
       f.write(str(process.pid))
 
   @classmethod
   def find_executions_by_project_id(cls, project_id):
-    return []
+    executions = []
+    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
+    project_dir = Path(cls.project_dir_format.format(root_dir=projects_dirs[0].value,
+                  prj=project_id))
+    for item in project_dir.iterdir():
+      if item.is_dir():
+        executions.append(cls.find_by_id_and_project_id(PurePath(item).name, project_id)[0])
+      
+    return executions
 
   @classmethod
   def find_by_id_and_project_id(cls, id, project_id):
     executions = []
     projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
-    project_dir = cls.project_dir_format.format(root_dir=projects_dirs[0].value,
+    exec_dir = cls.exec_dir_format.format(root_dir=projects_dirs[0].value,
                   prj=project_id,
                   exc=id)
-    if Path(project_dir).is_dir():
+    if Path(exec_dir).is_dir():
       try:
-        rc = int(cls.readAttribute(project_dir, "rc"))
+        rc = int(cls.readAttribute(exec_dir, "rc"))
       except:
         rc = None
-      start_time = int(cls.readAttribute(project_dir, "start_time"))
+      start_time = int(cls.readAttribute(exec_dir, "start_time"))
       try:
-        stop_time = int(cls.readAttribute(project_dir, "stop_time"))
+        stop_time = int(cls.readAttribute(exec_dir, "stop_time"))
       except:
         stop_time = None
-      j_settings = json.loads(cls.readAttribute(project_dir, "settings"))
+      j_settings = json.loads(cls.readAttribute(exec_dir, "settings"))
       settings = {}
       for s in j_settings:
         settings[s] = SettingModel(**j_settings[s])
         
-      commandline = cls.readAttribute(project_dir, "commandline")
+      commandline = cls.readAttribute(exec_dir, "commandline")
       execution = ExecutionModel(project_id = project_id, 
               id = id,
               rc = rc,
@@ -174,17 +185,32 @@ class ExecutionModel():
               commandline = commandline)
       executions.append(execution)
     return executions
+  
+  @classmethod
+  def delete_by_id_and_project_id(cls, id, project_id):
+    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
+    exec_dir = cls.exec_dir_format.format(root_dir=projects_dirs[0].value,
+                  prj=project_id,
+                  exc=id)
+    if Path(exec_dir).is_dir():
+      try:
+        shutil.rmtree(Path(exec_dir))
+      except:
+        logging.error("Impossible to delete {}".format(exec_dir))
+        raise ValueError("Impossible to delete {}".format(exec_dir))
+      return True
+    return False
 
   @classmethod
-  def readAttribute(cls, project_dir, attr):
-      if Path(project_dir + "/" + attr).is_file():
-        with open(project_dir + "/" + attr, "r") as f:
+  def readAttribute(cls, exec_dir, attr):
+      if Path(exec_dir + "/" + attr).is_file():
+        with open(exec_dir + "/" + attr, "r") as f:
           return f.read().rstrip()
       return None
     
   @classmethod
   def getUniqueID(cls, project_id):
-    #TODO implement unique ID
-    return random.randrange(100000)
+    #TODO do a more robust approach
+    return int("{}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
 
 

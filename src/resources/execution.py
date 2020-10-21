@@ -17,11 +17,11 @@ class Execution(Resource):
     return {'message': 'Execution not found'}, 404
 
   @jwt_required()
-  def delete(self, id):
-    project = ProjectModel.find_by_id(id)
-    if project:
-      project.delete_from_db()
-      return {'message': 'Item deleted.'}
+  def delete(self, project_id, id):
+    if len(ProjectModel.find_by_id(project_id)) == 0:
+      return {'message': 'Project not found'}, 404
+    if ExecutionModel.delete_by_id_and_project_id(id, project_id):
+      return {'message': 'Item deleted.'}, 200
     return {'message': 'Item not found.'}, 404
 
 
