@@ -32,9 +32,6 @@ class Project(Resource):
       return project[0].json()
     return {'message': 'Item not found'}, 404
 
-  def post(self):
-    pass
-
   def delete(self, id):
     project = ProjectModel.find_by_id(id)
     if project:

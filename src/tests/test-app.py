@@ -1,5 +1,6 @@
 import unittest
 import logging
+import time
 import json
 import sys
 import warnings
@@ -481,12 +482,13 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertTrue(response['stop_time'] is None)
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    execution_id = response['id']
     # Get a execution of the new project
-    rv = self.app.get('/api/v1/project/1/execution/' + str(response['id']), headers = self.headers)
+    rv = self.app.get('/api/v1/project/1/execution/' + str(execution_id), headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     response = json.loads(rv.data.decode("utf-8"))
-    try: self.assertTrue(isinstance(response['id'], int))
+    try: self.assertEqual(response['id'], execution_id)
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertTrue(response['project_id'] == 1)
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
@@ -500,8 +502,25 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertTrue(response['stop_time'] is None)
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    # Get a execution output of the new project
+    time.sleep(1)
+    first_byte = 0
+    last_byte = 200
+    payload = { "first_requested_byte": first_byte, "last_requested_byte": last_byte}
+    rv = self.app.get('/api/v1/project/1/execution/' + str(execution_id) + "/output", json = payload, headers = self.headers)
+    try: self.assertEqual(rv.status, '200 OK')
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    response = json.loads(rv.data.decode("utf-8"))
+    try: self.assertEqual(response['first_transmitted_byte'], first_byte)
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertEqual(response['last_transmitted_byte'], last_byte)
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertTrue(isinstance(response['file_bytes'], int))
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
+    try: self.assertTrue(response['data'])
+    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Delete a execution of the new project
-    rv = self.app.delete('/api/v1/project/1/execution/' + str(response['id']), headers = self.headers)
+    rv = self.app.delete('/api/v1/project/1/execution/' + str(execution_id), headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Get all executions of the project
@@ -511,28 +530,6 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "executions" : [ ] })
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
 
-#    # Create second project 
-#    rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
-#    try: self.assertEqual(rv.status, '201 CREATED')
-#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-#    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name2, "id": 2})
-#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-#    # Get all enviroments of the first project
-#    rv = self.app.get('/api/v1/project/1/environments', headers = self.headers)
-#    try: self.assertEqual(rv.status, '200 OK')
-#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-#    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environments" : [
-#    { "id": 1, 
-#      "description": None,
-#      "value": value,
-#      "name": name } ] })
-#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-#    # Get all enviroments of the second project
-#    rv = self.app.get('/api/v1/project/2/environments', headers = self.headers)
-#    try: self.assertEqual(rv.status, '200 OK')
-#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-#    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environments" : [ ] })
-#    except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
 
 
 if __name__ == '__main__':

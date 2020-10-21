@@ -18,6 +18,20 @@ def preexec_function():
   # Ignore sighup signal
   signal.signal(signal.SIGHUP, signal.SIG_IGN)
 
+class ExecutionOutputModel():
+  def __init__(self, first_transmitted_byte = None, last_transmitted_byte = None, file_bytes = None, data = None):
+    self.first_transmitted_byte = first_transmitted_byte
+    self.last_transmitted_byte = last_transmitted_byte
+    self.file_bytes = file_bytes
+    self.data = data
+
+  def json(self):
+    return {'first_transmitted_byte': self.first_transmitted_byte,
+            'last_transmitted_byte': self.last_transmitted_byte,
+            'file_bytes': self.file_bytes, 
+            'data': self.data
+           }
+
 class ExecutionModel():
   id = None
   start_time = None
@@ -39,10 +53,6 @@ class ExecutionModel():
     self.stop_time = stop_time
     self.settings = settings
     self.commandline = commandline
-
-
-  def readFromFS(self):
-    pass
 
   def json(self):
     return { 'id': self.id, 
@@ -143,6 +153,7 @@ class ExecutionModel():
 
   @classmethod
   def find_executions_by_project_id(cls, project_id):
+    #TODO implement a limit of executions
     executions = []
     projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
     project_dir = Path(cls.project_dir_format.format(root_dir=projects_dirs[0].value,
@@ -208,6 +219,23 @@ class ExecutionModel():
           return f.read().rstrip()
       return None
     
+  @classmethod
+  def get_output(cls, id, project_id, first_byte, last_byte):
+    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
+    exec_dir = cls.exec_dir_format.format(root_dir=projects_dirs[0].value,
+                  prj=project_id,
+                  exc=id)
+    file_to_read = exec_dir + "/output"
+    file_to_read_path = Path(file_to_read)
+    if file_to_read_path.is_file():
+      size = file_to_read_path.stat().st_size
+      with open(file_to_read, "r") as f:
+        buffer_len = last_byte - first_byte
+        first_byte = f.seek(first_byte)
+        data = f.read(buffer_len)
+        return ExecutionOutputModel(first_byte, first_byte + buffer_len, size, data)
+    return None
+
   @classmethod
   def getUniqueID(cls, project_id):
     #TODO do a more robust approach

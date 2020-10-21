@@ -9,7 +9,7 @@ from resources.project import Project, ProjectList, NewProject
 from resources.project_setting import ProjectSetting, ProjectSettingList
 from resources.main_setting import MainSettingList, MainSetting
 from resources.environment import EnvironmentList, Environment, NewEnvironment
-from resources.execution import Execution, NewExecution, ExecutionList
+from resources.execution import Execution, NewExecution, ExecutionList, ExecutionOutput
 from utils.networking import get_my_ip
 from utils.data import bootstrap
 
@@ -41,6 +41,7 @@ api.add_resource(NewEnvironment,  '/api/v1/project/<int:project_id>/new_environm
 
 api.add_resource(ExecutionList, '/api/v1/project/<int:project_id>/executions')
 api.add_resource(Execution, '/api/v1/project/<int:project_id>/execution/<int:id>')
+api.add_resource(ExecutionOutput, '/api/v1/project/<int:project_id>/execution/<int:id>/output')
 api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 
 if __name__ == '__main__':
