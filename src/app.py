@@ -1,10 +1,13 @@
 from flask import Flask
 from flask_restful import Api
+from flask_jwt_extended import JWTManager
 from flask_jwt import JWT
 import logging
 
 from security import authenticate, identity
+from resources import frontend
 from resources.user import UserRegister
+from resources.userlogin import UserLogin
 from resources.project import Project, ProjectList, NewProject
 from resources.project_setting import ProjectSetting, ProjectSettingList
 from resources.main_setting import MainSettingList, MainSetting
@@ -20,8 +23,10 @@ app.secret_key = 'jose'
 api = Api(app)
 
 
-
-jwt = JWT(app, authenticate, identity)  # /auth
+# API
+#jwt = JWT(app, authenticate, identity)  # /auth
+jwt = JWTManager(app)
+api.add_resource(UserLogin,     '/auth')
 
 api.add_resource(Project,     '/api/v1/project/<int:id>')
 api.add_resource(ProjectList, '/api/v1/projects')
@@ -43,6 +48,12 @@ api.add_resource(ExecutionList, '/api/v1/project/<int:project_id>/executions')
 api.add_resource(Execution, '/api/v1/project/<int:project_id>/execution/<int:id>')
 api.add_resource(ExecutionOutput, '/api/v1/project/<int:project_id>/execution/<int:id>/output')
 api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
+
+# Frontend
+app.add_url_rule('/', view_func=frontend.index)
+app.add_url_rule('/login/', view_func=frontend.login)
+app.add_url_rule('/css/stylesheet.css', view_func=frontend.stylesheet)
+app.add_url_rule('/js/main.js', view_func=frontend.main_js)
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
