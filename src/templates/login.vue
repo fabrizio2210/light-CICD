@@ -1,17 +1,5 @@
 <div id="app">
 
-  <div class="product">
-
-    <div class="product-image">
-      <img :src="image" />
-    </div>
-
-    <div class="product-info">
-      <h1>{{ product }}</h1>
-    </div>
-
-  </div>  
-
   <div>
     <p>Username:</p>
     <input v-model="username" placeholder="fabrizio2">
