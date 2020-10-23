@@ -24,7 +24,6 @@ api = Api(app)
 
 
 # API
-#jwt = JWT(app, authenticate, identity)  # /auth
 jwt = JWTManager(app)
 api.add_resource(UserLogin,     '/auth')
 
