@@ -57,6 +57,11 @@ button {
   background-color: #d8d8d8;
 }
 
+.errorText {
+  background-color: #ff8b8b;
+  color: #d00000;
+}
+
 .review-form {
   width: 30%;
   padding: 20px;

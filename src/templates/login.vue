@@ -6,14 +6,17 @@
     <p>Password:</p>
     <input v-model="password" placeholder="pwd2">
     <button v-on:click="login()">Login</button>
+    <button v-on:click="logout()">Logout</button>
+    <p class="errorText" v-if="login_status == 2">{{ login_error }}</p>
   </div>
 
+  <div v-if="login_status == 1">
+    <a href="/web/projects">Your projects</a>
+  </div>
   <div>
-    <p>JWT: {{jwt}}</p>
     <p>User ID: {{jwtData.identity}}</p>
-    <p>Access: {{jwtData.access_token}}</p>
-    <p>Refresh: {{jwtData.refresh_token}}</p>
-    <button v-on:click="doSomethingWithJWT()">Do Something</button>
+    <p>Access: {{access_token}}</p>
+    <p>Refresh: {{refresh_token}}</p>
   </div>
 
 </div> 

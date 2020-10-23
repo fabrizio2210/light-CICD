@@ -1,24 +1,17 @@
-//Add a link to your data object, and use v-bind to sync it up with an anchor tag in your HTML. Hint: you’ll be binding to the href attribute.
+
 
 var app = new Vue({
   el: '#app',
   data: {
-    jwt: "",
-    username: "",
-    password: ""
+    username: "fabrizio2",
+    password: "pwd2",
+    jwtData: {},
+    access_token: "",
+    refresh_token: "",
+    login_status: 0,
+    login_error: "",
   }, 
   computed: {
-    // this.jwtData will update whenever this.jwt changes.
-    jwtData() {
-      // JWT's are two base64-encoded JSON objects and a trailing signature
-      // joined by periods. The middle section is the data payload.
-      if (this.jwt) return {
-         identity: JSON.parse(atob(this.jwt['access_token'].split('.')[1])).identity,
-         access_token:this.jwt['access_token'],
-         refresh_token:this.jwt['refresh_token'],
-         };
-      return {};
-    }
   },
   methods: {
     async login() {
@@ -29,34 +22,43 @@ var app = new Vue({
           'Content-Type': 'application/json'
         }),
         body: JSON.stringify({"username": this.username, "password" : this.password})
+      }).catch(error => {
+        console.error('Proble during login:', error);
       });
-      this.jwt = await res.json();
+      if (res.ok){
+        var jwt = await res.json();
+        this.jwtData.identity= JSON.parse(atob(jwt['access_token'].split('.')[1])).identity;
+        this.access_token= await jwt['access_token'];
+        this.refresh_token= jwt['refresh_token'];
+        this.login_status = 1;
+        this.login_error = 1;
+      } else {
+        this.login_status = 2;
+        this.login_error = (await res.json())['message'];
+      }
+    },
+
+    logout: function() {
+      this.access_token = "";
+      this.refresh_token = ""; 
     },
 
     async fetchJWT() {
-      // Error handling and such omitted here for simplicity.
-      const res = await fetch(`/auth`,{
-        method: 'POST',
-        headers: new Headers({
-          'Content-Type': 'application/json'
-        }),
-        body: JSON.stringify({"username": "fabrizio2", "password" : "pwd2"})
-      });
-      this.jwt = await res.json();
+      if (this.refresh_token) {
+        // Error handling and such omitted here for simplicity.
+        const res = await fetch(`/refresh`,{
+          method: 'POST',
+          headers: new Headers({
+            'Authorization': `Bearer ${this.refresh_token}`
+          }),
+        });
+        var jwt = await res.json();
+        this.access_token= jwt['access_token'];
+      }
     },
-
-    async doSomethingWithJWT() {
-      const res = await fetch(`http://localhost/vuejs-jwt-example/do-something`, {
-        method: 'POST',
-        headers: new Headers({
-          'Authorization': `Bearer: ${this.jwt}`
-        })
-      });
-      // Do stuff with res here.
-    }
   },
   mounted() {
-    this.fetchJWT();
+    setInterval(this.fetchJWT, 5000);
   }
 })
 
