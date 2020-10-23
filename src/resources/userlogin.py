@@ -2,7 +2,9 @@ from models.user import UserModel
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
     create_access_token,
-    create_refresh_token
+    create_refresh_token,
+    jwt_refresh_token_required,
+    get_jwt_identity
 )
 from werkzeug.security import safe_str_cmp
 
@@ -35,4 +37,14 @@ class UserLogin(Resource):
             }, 200
 
         return {"message": "Invalid Credentials!"}, 401
+
+
+class TokenRefresh(Resource):
+    @jwt_refresh_token_required
+    def post(self):
+        # retrive the user's identity from the refresh token using a Flask-JWT-Extended built-in method
+        current_user = get_jwt_identity()
+        # return a non-fresh token for the user
+        new_token = create_access_token(identity=current_user, fresh=False)
+        return {'access_token': new_token}, 200
 

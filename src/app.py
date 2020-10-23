@@ -4,10 +4,9 @@ from flask_jwt_extended import JWTManager
 from flask_jwt import JWT
 import logging
 
-from security import authenticate, identity
 from resources import frontend
 from resources.user import UserRegister
-from resources.userlogin import UserLogin
+from resources.userlogin import UserLogin, TokenRefresh
 from resources.project import Project, ProjectList, NewProject
 from resources.project_setting import ProjectSetting, ProjectSettingList
 from resources.main_setting import MainSettingList, MainSetting
@@ -26,6 +25,7 @@ api = Api(app)
 # API
 jwt = JWTManager(app)
 api.add_resource(UserLogin,     '/auth')
+api.add_resource(TokenRefresh,     '/refresh')
 
 api.add_resource(Project,     '/api/v1/project/<int:id>')
 api.add_resource(ProjectList, '/api/v1/projects')
@@ -50,7 +50,7 @@ api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 
 # Frontend
 app.add_url_rule('/', view_func=frontend.index)
-app.add_url_rule('/login/', view_func=frontend.login)
+app.add_url_rule('/web/login/', view_func=frontend.login)
 app.add_url_rule('/css/stylesheet.css', view_func=frontend.stylesheet)
 app.add_url_rule('/js/main.js', view_func=frontend.main_js)
 
