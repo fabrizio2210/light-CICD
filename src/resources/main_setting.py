@@ -1,6 +1,7 @@
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required, current_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.main_setting import MainSettingModel
+from models.user import UserModel
 
 
 class MainSetting(Resource):
@@ -11,17 +12,18 @@ class MainSetting(Resource):
                       help="This field cannot be left blank!"
                       )
 
-  @jwt_required()
+  @jwt_required
   def get(self, name):
     settings = MainSettingModel.get_setting_by_name(name)
     if settings:
       return settings[0].json()
     return {'message': 'Item not found'}, 404
 
-  @jwt_required()
+  @jwt_required
   def put(self, name):
     data = MainSetting.parser.parse_args()
-    if current_identity.admin != 1:
+    users = UserModel.find_by_id(get_jwt_identity())
+    if users[0].admin != 1:
       return {'message': "Admin privileges are required"}, 403
     settings = MainSettingModel.get_setting_by_name(name)
     if settings:
@@ -34,7 +36,7 @@ class MainSetting(Resource):
 
 class MainSettingList(Resource):
 
-    @jwt_required()
+    @jwt_required
     def get(self):
       return {'settings': list(map(lambda x: x.json(), MainSettingModel.get_all_settings()))}
 

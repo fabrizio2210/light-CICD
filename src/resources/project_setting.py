@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required, current_identity
+from flask_jwt import current_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.setting import SettingModel
 from models.project import ProjectModel
 from models.project_setting_map import ProjectSettingMap
@@ -15,13 +16,13 @@ class ProjectSetting(Resource):
                       help="This field cannot be left blank!"
                       )
 
-  @jwt_required()
+  @jwt_required
   def get(self, project_id, name):
     # Check if project owner
     owner_maps = UserProjectMap.find_user_id_by_project_id(project_id)
     if not owner_maps:
       return {'message': "Project not found"}, 404
-    if owner_maps[0].user_id != current_identity.id:
+    if owner_maps[0].user_id != get_jwt_identity():
       return {'message': "You have to own the project"}, 403
 
     # Get the setting (it can be new)
@@ -31,13 +32,13 @@ class ProjectSetting(Resource):
 
     return setting.json()
 
-  @jwt_required()
+  @jwt_required
   def put(self, project_id, name):
     # Check if project owner
     owner_maps = UserProjectMap.find_user_id_by_project_id(project_id)
     if not owner_maps:
       return {'message': "Project not found"}, 404
-    if owner_maps[0].user_id != current_identity.id:
+    if owner_maps[0].user_id != get_jwt_identity():
       return {'message': "You have to own the project"}, 403
 
     # Get the setting (it can be new)
@@ -70,7 +71,7 @@ class ProjectSetting(Resource):
 
 class ProjectSettingList(Resource):
 
-    @jwt_required()
+    @jwt_required
     def get(self, project_id):
       if len(ProjectModel.find_by_id(project_id)) == 0:
         return {'message': 'Project not found'}, 404

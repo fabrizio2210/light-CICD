@@ -158,9 +158,10 @@ class ExecutionModel():
     projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
     project_dir = Path(cls.project_dir_format.format(root_dir=projects_dirs[0].value,
                   prj=project_id))
-    for item in project_dir.iterdir():
-      if item.is_dir():
-        executions.append(cls.find_by_id_and_project_id(PurePath(item).name, project_id)[0])
+    if project_dir.is_dir():
+      for item in project_dir.iterdir():
+        if item.is_dir():
+          executions.append(cls.find_by_id_and_project_id(PurePath(item).name, project_id)[0])
       
     return executions
 

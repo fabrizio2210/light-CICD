@@ -1,5 +1,6 @@
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required, current_identity
+from flask_jwt import  current_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.project import ProjectModel
 from models.user_project_map import UserProjectMap
 from models.project_setting_map import ProjectSettingMap
@@ -18,14 +19,14 @@ class Project(Resource):
                       help="If the project is enabled or not "
                       )
 
-  @jwt_required()
+  @jwt_required
   def get(self, name):
     project = ProjectModel.find_by_name(name)
     if project:
       return project[0].json()
     return {'message': 'Item not found'}, 404
 
-  @jwt_required()
+  @jwt_required
   def get(self, id):
     project = ProjectModel.find_by_id(id)
     if project:
@@ -52,9 +53,9 @@ class Project(Resource):
 
 class ProjectList(Resource):
 
-    @jwt_required()
+    @jwt_required
     def get(self):
-      return {'projects': list(map(lambda x: x.json(), ProjectModel.get_projects_by_user_id(current_identity.id)))}
+      return {'projects': list(map(lambda x: x.json(), ProjectModel.get_projects_by_user_id(get_jwt_identity())))}
 
 
 class NewProject(Resource):
@@ -66,7 +67,7 @@ class NewProject(Resource):
                       help="If the project is enabled or not "
                       )
 
-  @jwt_required()
+  @jwt_required
   def post(self, name):
     if ProjectModel.find_by_name(name):
       return {'message': "A project with name '{}' already exists.".format(name)}, 400
@@ -81,7 +82,7 @@ class NewProject(Resource):
       return {"message": "An error occurred inserting the item."}, 500
 
     # Map the project to the user
-    mapping_user = UserProjectMap(user_id = current_identity.id, project_id = project.id)
+    mapping_user = UserProjectMap(user_id = get_jwt_identity(), project_id = project.id)
     try:
       mapping_user.save_to_db()
     except:

@@ -32,7 +32,7 @@ class TestAPI_without_auth(unittest.TestCase):
 
   def test_010_root(self):
     rv = self.app.get('/')
-    self.assertEqual(rv.status, '404 NOT FOUND')
+    self.assertEqual(rv.status, '200 OK')
 
   def test_020_get_token(self):
     # An invalid credential raises an error in the log

@@ -2,6 +2,7 @@ from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_jwt import JWT
+from flask_cors import CORS
 import logging
 
 from resources import frontend
@@ -18,8 +19,10 @@ from utils.data import bootstrap
 
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['JWT_HEADER_TYPE'] = "JWT" 
 app.secret_key = 'jose'
 api = Api(app)
+
 
 
 # API
@@ -51,8 +54,10 @@ api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 # Frontend
 app.add_url_rule('/', view_func=frontend.index)
 app.add_url_rule('/web/login/', view_func=frontend.login)
+app.add_url_rule('/web/projects/', view_func=frontend.projects)
 app.add_url_rule('/css/stylesheet.css', view_func=frontend.stylesheet)
 app.add_url_rule('/js/main.js', view_func=frontend.main_js)
+app.add_url_rule('/js/projects.js', view_func=frontend.projects_js)
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
@@ -60,4 +65,6 @@ if __name__ == '__main__':
   bootstrap()
   from db import db
   my_ip = get_my_ip()
+  # enable CORS
+  CORS(app, resources={r'/*': {'origins': '*'}})
   app.run(host=my_ip, port=5000, debug=True)
