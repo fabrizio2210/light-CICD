@@ -3,9 +3,7 @@
     <p class="errorText" v-if="login_status == 2">{{ login_error }}</p>
     <a v-if="login_status == 1" href="/web/projects">Your projects</a>
     <div v-if="auth.user" >
-      <p>User ID: {{jwtData.identity}}</p>
-      <p>Access: {{auth.user.access_token}}</p>
-      <p>Refresh: {{auth.user.refresh_token}}</p>
+      <p>Logged in as: {{auth.username}}</p>
     </div>
   </div>
 </template>

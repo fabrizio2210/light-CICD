@@ -11,7 +11,7 @@ export const authentication = {
   state: initialState,
   actions: {
     login({ dispatch, commit }, { username, password }) {
-      commit("loginRequest", { username });
+      commit("loginRequest", username );
 
       userService.login(username, password).then(
         user => {
@@ -33,9 +33,10 @@ export const authentication = {
     }
   },
   mutations: {
-    loginRequest(state, user) {
+    loginRequest(state, username) {
       state.status = { loggingIn: true };
-      state.user = user;
+      state.user = null;
+      state.username = username;
     },
     loginSuccess(state, user) {
       state.status = { loggedIn: true };
