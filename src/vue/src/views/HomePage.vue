@@ -8,10 +8,12 @@
             </div>
             <div class="form-group">
                 <button class="btn btn-primary" :disabled="creating" >New Project</button>
+                <img v-show="creating" src="../assets/loading.gif" />
             </div>
         </form>
         <h3>Projects from secure api end point:</h3>
         <em v-if="projects.loading">Loading projects...</em>
+        <img v-show="projects.loading" src="../assets/loading.gif" />
         <span v-if="projects.error" class="text-danger">ERROR: {{projects.error}}</span>
         <ul v-if="projects.projects">
             <li v-for="project in projects.projects" :key="project.id">
