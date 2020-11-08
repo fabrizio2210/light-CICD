@@ -32,7 +32,7 @@ class TestAPI_without_auth(unittest.TestCase):
 
   def test_010_root(self):
     rv = self.app.get('/')
-    self.assertEqual(rv.status, '200 OK')
+    self.assertEqual(rv.status, '404 NOT FOUND')
 
   def test_020_get_token(self):
     # An invalid credential raises an error in the log
@@ -42,7 +42,7 @@ class TestAPI_without_auth(unittest.TestCase):
                { "cred": { "username": "not_exist_s345ffsdg", "password": "not_exist"}, "res": "401 UNAUTHORIZED"},
                { "cred": { "username": admin_user, "password": "not_exist"}, "res": "401 UNAUTHORIZED"} ]
     for login in logins:
-      rv = self.app.post('/auth', json = login['cred'])
+      rv = self.app.post('/api/auth', json = login['cred'])
       self.assertEqual(rv.status, login['res'])
     logging.disable(logging.NOTSET)
 
@@ -56,7 +56,7 @@ class TestAPI_MainSettingAsAdmin(unittest.TestCase):
     app.app.testing = True
     self.app = app.app.test_client()
     initialize_test()
-    rv = self.app.post('/auth', json = { "username": admin_user, "password": admin_password})
+    rv = self.app.post('/api/auth', json = { "username": admin_user, "password": admin_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
 
   def test_020_get_settings(self):
@@ -90,7 +90,7 @@ class TestAPI_MainSettingasUser(unittest.TestCase):
     app.app.testing = True
     self.app = app.app.test_client()
     initialize_test()
-    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    rv = self.app.post('/api/auth', json = { "username": normal_user, "password": normal_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
 
   def test_020_get_settings(self):
@@ -129,7 +129,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     self.maxDiff = None
     self.app = app.app.test_client()
     initialize_test()
-    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    rv = self.app.post('/api/auth', json = { "username": normal_user, "password": normal_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
 
   def tearDown(self):
@@ -158,7 +158,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1 })
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create second project as second user
-    rv = self.app.post('/auth', json = { "username": second_user, "password": second_password})
+    rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
     rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
@@ -210,7 +210,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
       "default_value": None })
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create second project as second user
-    rv = self.app.post('/auth', json = { "username": second_user, "password": second_password})
+    rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
     rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
@@ -222,7 +222,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '403 FORBIDDEN')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Try to modify as second user
-    rv = self.app.post('/auth', json = { "username": second_user, "password": second_password})
+    rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
     payload = { "value": value2 }
     rv = self.app.put('/api/v1/project/1/setting/scm_url', json = payload, headers = self.headers)
@@ -261,14 +261,14 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
       "default_value": None })
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Try to modify as second user
-    rv = self.app.post('/auth', json = { "username": second_user, "password": second_password})
+    rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
     payload = { "value": value2 }
     rv = self.app.put('/api/v1/project/1/setting/scm_url', json = payload, headers = self.headers)
     try: self.assertEqual(rv.status, '403 FORBIDDEN')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Get setting as first user
-    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    rv = self.app.post('/api/auth', json = { "username": normal_user, "password": normal_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
     rv = self.app.get('/api/v1/project/1/setting/scm_url', headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
@@ -290,7 +290,7 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
     app.app.testing = True
     self.app = app.app.test_client()
     initialize_test()
-    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    rv = self.app.post('/api/auth', json = { "username": normal_user, "password": normal_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
 
   def tearDown(self):
@@ -379,14 +379,14 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
       "value": value, })
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Try to modify as second user
-    rv = self.app.post('/auth', json = { "username": second_user, "password": second_password})
+    rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
     payload = { "value": value2 }
     rv = self.app.put('/api/v1/project/environment/1', json = payload, headers = self.headers)
     try: self.assertEqual(rv.status, '403 FORBIDDEN')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Delete as first user
-    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    rv = self.app.post('/api/auth', json = { "username": normal_user, "password": normal_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
     rv = self.app.delete('/api/v1/project/environment/1', headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
@@ -418,7 +418,7 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     # Creating a subshell and closing the application creates a ResourceWarning
     warnings.simplefilter("ignore", ResourceWarning)
     initialize_test()
-    rv = self.app.post('/auth', json = { "username": normal_user, "password": normal_password})
+    rv = self.app.post('/api/auth', json = { "username": normal_user, "password": normal_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
 
   def tearDown(self):

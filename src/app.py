@@ -5,7 +5,6 @@ from flask_jwt import JWT
 from flask_cors import CORS
 import logging
 
-from resources import frontend
 from resources.user import UserRegister
 from resources.userlogin import UserLogin, TokenRefresh
 from resources.project import Project, ProjectList, NewProject
@@ -51,13 +50,6 @@ api.add_resource(Execution, '/api/v1/project/<int:project_id>/execution/<int:id>
 api.add_resource(ExecutionOutput, '/api/v1/project/<int:project_id>/execution/<int:id>/output')
 api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 
-# Frontend
-app.add_url_rule('/', view_func=frontend.index)
-app.add_url_rule('/web/login/', view_func=frontend.login)
-app.add_url_rule('/web/projects/', view_func=frontend.projects)
-app.add_url_rule('/css/stylesheet.css', view_func=frontend.stylesheet)
-app.add_url_rule('/js/main.js', view_func=frontend.main_js)
-app.add_url_rule('/js/projects.js', view_func=frontend.projects_js)
 
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
