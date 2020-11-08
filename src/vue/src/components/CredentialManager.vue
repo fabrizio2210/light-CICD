@@ -49,7 +49,7 @@ export default {
     },
   },
   mounted() {
-    setInterval(this.refreshJWT, 5000);
+    setInterval(this.refreshJWT, 20000);
   }
 };
 </script>
