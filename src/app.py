@@ -27,8 +27,8 @@ api = Api(app)
 
 # API
 jwt = JWTManager(app)
-api.add_resource(UserLogin,     '/auth')
-api.add_resource(TokenRefresh,     '/refresh')
+api.add_resource(UserLogin,     '/api/auth')
+api.add_resource(TokenRefresh,     '/api/refresh')
 
 api.add_resource(Project,     '/api/v1/project/<int:id>')
 api.add_resource(ProjectList, '/api/v1/projects')
@@ -67,4 +67,5 @@ if __name__ == '__main__':
   my_ip = get_my_ip()
   # enable CORS
   CORS(app, resources={r'/*': {'origins': '*'}})
-  app.run(host=my_ip, port=5000, debug=True)
+  logging.info("Connect to http://{}:5000/".format(my_ip))
+  app.run(host="0.0.0.0", port=5000, debug=True)
