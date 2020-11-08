@@ -146,7 +146,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '404 NOT FOUND')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create project
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name" : prj_name}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
@@ -160,7 +160,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     # Create second project as second user
     rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name2}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name2, "id": 2})
@@ -183,7 +183,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '404 NOT FOUND')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create first project
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
@@ -212,7 +212,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     # Create second project as second user
     rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
     self.headers = {'Content-Type': 'application/json', 'Authorization': "JWT " + json.loads(rv.data.decode("utf-8"))['access_token']}
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name2}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name2, "id": 2})
@@ -244,7 +244,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     value = "http://github.com/fdfdsfsd/dfsddf.git"
     value2 = "http://github.com/fdfd/dff.git"
     # Create project
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
@@ -310,7 +310,7 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '404 NOT FOUND')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create first project
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
@@ -333,7 +333,7 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
       "name": name })
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create second project 
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name2), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name2}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name2, "id": 2})
@@ -363,7 +363,7 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
     name2 = "MY_VARIABLE2"
     value2 = "MY_BEAUTIFUL_VARIABLE2"
     # Create project
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
@@ -443,7 +443,7 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     try: self.assertEqual(rv.status, '404 NOT FOUND')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create first project
-    rv = self.app.post("/api/v1/new_project/{}".format(prj_name), json = {}, headers = self.headers)
+    rv = self.app.post("/api/v1/new_project", json = {"name": prj_name}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
@@ -533,5 +533,5 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
 
 
 if __name__ == '__main__':
-  logging.basicConfig(level=logging.ERROR)
+  logging.basicConfig(level=logging.INFO)
   unittest.main()

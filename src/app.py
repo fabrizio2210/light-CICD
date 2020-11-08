@@ -31,7 +31,7 @@ api.add_resource(TokenRefresh,     '/api/refresh')
 
 api.add_resource(Project,     '/api/v1/project/<int:id>')
 api.add_resource(ProjectList, '/api/v1/projects')
-api.add_resource(NewProject,  '/api/v1/new_project/<string:name>')
+api.add_resource(NewProject,  '/api/v1/new_project')
 
 api.add_resource(ProjectSettingList, '/api/v1/project/<int:project_id>/settings')
 api.add_resource(ProjectSetting,     '/api/v1/project/<int:project_id>/setting/<string:name>')
@@ -54,7 +54,7 @@ api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 if __name__ == '__main__':
   logging.basicConfig(level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
   logging.info('Started')
-  bootstrap()
+  #bootstrap()
   from db import db
   my_ip = get_my_ip()
   # enable CORS

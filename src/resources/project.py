@@ -20,13 +20,6 @@ class Project(Resource):
                       )
 
   @jwt_required
-  def get(self, name):
-    project = ProjectModel.find_by_name(name)
-    if project:
-      return project[0].json()
-    return {'message': 'Item not found'}, 404
-
-  @jwt_required
   def get(self, id):
     project = ProjectModel.find_by_id(id)
     if project:
@@ -60,6 +53,11 @@ class ProjectList(Resource):
 
 class NewProject(Resource):
   parser = reqparse.RequestParser()
+  parser.add_argument('name',
+                      type=str,
+                      required=True,
+                      help="Name of the project"
+                      )
   parser.add_argument('disabled',
                       type=int,
                       required=False,
@@ -68,13 +66,13 @@ class NewProject(Resource):
                       )
 
   @jwt_required
-  def post(self, name):
-    if ProjectModel.find_by_name(name):
-      return {'message': "A project with name '{}' already exists.".format(name)}, 400
+  def post(self):
     data = NewProject.parser.parse_args()
+    if ProjectModel.find_by_name(data['name']):
+      return {'message': "A project with name '{}' already exists.".format(data['name'])}, 400
 
     # Create a new project
-    project = ProjectModel(name=name, id=None, **data)
+    project = ProjectModel(id=None, **data)
     try:
       project.save_to_db()
     except Exception as e:
