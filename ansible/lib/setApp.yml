@@ -25,6 +25,17 @@
         virtualenv: /opt/light-cicd/venv
         virtualenv_command: /usr/bin/python3.7 -m venv
 
+    - name: install Vue.js packages
+      apt:
+        name: "{{ node_packages }}"
+        state: present
+        update_cache: yes
+        cache_valid_time: 3600
+      vars:
+        node_packages:
+        - nodejs
+        - npm
+
     ###############
     #Installaazione Docker
     - name: Inserisci chiave gpg per Docker
