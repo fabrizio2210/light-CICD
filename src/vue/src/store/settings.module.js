@@ -45,6 +45,7 @@ export const settings = {
       state.all = { loading: true };
     },
     getAllSuccess(state, settings) {
+      //TODO: Organize the settings in a dictionary? Or create it from the backend
       state.all = { settings };
       for (var s of state.all.settings) {
         s.untouched = true;
