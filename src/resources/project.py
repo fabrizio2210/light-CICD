@@ -68,7 +68,10 @@ class NewProject(Resource):
   @jwt_required
   def post(self):
     data = NewProject.parser.parse_args()
-    if ProjectModel.find_by_name(data['name']):
+    user_id = get_jwt_identity()
+    check_projects = ProjectModel.get_projects_by_user_id(user_id)
+    check_projects = [pr for pr in check_projects if pr.name == data['name']]
+    if check_projects:
       return {'message': "A project with name '{}' already exists.".format(data['name'])}, 400
 
     # Create a new project
@@ -80,7 +83,7 @@ class NewProject(Resource):
       return {"message": "An error occurred inserting the item."}, 500
 
     # Map the project to the user
-    mapping_user = UserProjectMap(user_id = get_jwt_identity(), project_id = project.id)
+    mapping_user = UserProjectMap(user_id = user_id, project_id = project.id)
     try:
       mapping_user.save_to_db()
     except:
