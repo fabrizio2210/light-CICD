@@ -2,6 +2,7 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 
 import HomePage from "../views/HomePage.vue";
+import GeneralSettings from "../views/GeneralSettings.vue";
 import LoginPage from "../views/Login.vue";
 
 Vue.use(VueRouter);
@@ -11,6 +12,11 @@ const routes = [
     path: "/",
     name: "Home",
     component: HomePage
+  },
+  {
+    path: "/settings",
+    name: "Settings",
+    component: GeneralSettings
   },
   {
     path: "/login",

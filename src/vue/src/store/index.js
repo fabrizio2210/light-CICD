@@ -5,6 +5,7 @@ import { alert } from "./alert.module";
 import { authentication } from "./authentication.module";
 import { users } from "./users.module";
 import { projects } from "./projects.module";
+import { settings } from "./settings.module";
 
 Vue.use(Vuex);
 
@@ -13,7 +14,8 @@ const store = new Vuex.Store({
     alert,
     authentication,
     users,
-    projects
+    projects,
+    settings
   }
 });
 
