@@ -20,13 +20,14 @@ function getAll() {
   );
 }
 
-function update(settingname) {
+function update(settingname, settingvalue) {
   const requestOptions = {
     method: "PUT",
-    headers: authHeader()
+    headers: authHeader(),
+    body: JSON.stringify({ 'value': settingvalue })
   };
 
-  return fetch(`${config.apiUrl}/api/v1/settings/${settingname}`, requestOptions).then(
+  return fetch(`${config.apiUrl}/api/v1/setting/${settingname}`, requestOptions).then(
     handleResponse
   );
 }

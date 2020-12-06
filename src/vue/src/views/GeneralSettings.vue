@@ -6,11 +6,11 @@
         <span v-if="settings.error" class="text-danger">ERROR: {{settings.error}}</span>
         <ul v-if="settings.settings">
             <li v-for="setting in settings.settings" :key="setting.id">
-                <form @submit.prevent="handleSubmit">
+                <form @submit.prevent="handleSubmit(setting.name)">
                     <div class="form-group">
-                        <label for="settingname">{{setting.id + '. ' + setting.description + ': '}}</label>
-                        <input type="text" v-model="setting.value" :placeholder="setting.default_value" name="settingname" class="form-control" />
-                        <button class="btn btn-primary" :disabled="updating" >Update</button>
+                        <label for="settingvalue">{{setting.id + '. ' + setting.description + ': '}}</label>
+                        <input type="text" v-on:keydown="setting.untouched=false" v-model="setting.value" :placeholder="setting.default_value" name="settingvalue" class="form-control" />
+                        <button class="btn btn-primary" :disabled="setting.untouched||updating" >Update</button>
                     </div>
                 </form>
             </li>
@@ -22,8 +22,6 @@
 export default {
     data () {
         return {
-            settingname: '',
-            submitted: false
         }
     },
     computed: {
@@ -37,13 +35,15 @@ export default {
             return this.$store.state.settings.all;
         }
     },
+    watch: {
+    },
     methods: {
-        handleSubmit () {
-            this.submitted = true;
-            const { settingname } = this;
+        handleSubmit (settingname) {
+            //const  settingvalue = this.$store.state.settings.all.settings.find(x => x.name == settingname).value;
+            const  settingvalue = this.settings.settings.find(x => x.name == settingname).value;
             const { dispatch } = this.$store;
             if (settingname) {
-                dispatch('settings/updating', { settingname });
+                dispatch('settings/updating', { settingname, settingvalue });
             }
         }
     },

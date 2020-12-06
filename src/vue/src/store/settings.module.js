@@ -7,9 +7,9 @@ export const settings = {
     status : {}
   },
   actions: {
-    updating({ dispatch, commit }, { settingname }) {
+    updating({ dispatch, commit }, { settingname, settingvalue }) {
       commit("updatingRequest", { });
-        settingService.update(settingname).then(
+        settingService.update(settingname, settingvalue).then(
           setting => {
             commit("updatingSuccess", setting);
           },
@@ -34,7 +34,8 @@ export const settings = {
     },
     updatingSuccess(state, setting) {
       state.status = { updated: true };
-      state.all.settings.push(setting);
+      setting.untouched = true;
+      Object.assign(state.all.settings[state.all.settings.findIndex(x => x.name == setting.name)], setting);
     },
     updatingFailure(state) {
       state.status = {};
@@ -45,6 +46,9 @@ export const settings = {
     },
     getAllSuccess(state, settings) {
       state.all = { settings };
+      for (var s of state.all.settings) {
+        s.untouched = true;
+      }
     },
     getAllFailure(state, error) {
       state.all = { error };
