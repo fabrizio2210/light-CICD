@@ -35,7 +35,7 @@ export const settings = {
     updatingSuccess(state, setting) {
       state.status = { updated: true };
       setting.untouched = true;
-      Object.assign(state.all.settings[state.all.settings.findIndex(x => x.name == setting.name)], setting);
+      Object.assign(state.all.settings_dict[setting.name], setting);
     },
     updatingFailure(state) {
       state.status = {};
@@ -45,11 +45,10 @@ export const settings = {
       state.all = { loading: true };
     },
     getAllSuccess(state, settings) {
-      //TODO: Organize the settings in a dictionary? Or create it from the backend
-      state.all = { settings };
-      for (var s of state.all.settings) {
-        s.untouched = true;
-      }
+      const settings_dict = {}
+      settings.forEach((element) => element.untouched = true);
+      settings.forEach((element) => settings_dict[element.name] = element);
+      state.all = { settings_dict };
     },
     getAllFailure(state, error) {
       state.all = { error };

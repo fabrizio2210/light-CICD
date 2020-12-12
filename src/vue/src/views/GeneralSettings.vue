@@ -4,8 +4,8 @@
         <em v-if="settings.loading">Loading settings...</em>
         <img v-show="settings.loading" src="../assets/loading.gif" />
         <span v-if="settings.error" class="text-danger">ERROR: {{settings.error}}</span>
-        <ul v-if="settings.settings">
-            <li v-for="setting in settings.settings" :key="setting.id">
+        <ul v-if="settings.settings_dict">
+            <li v-for="setting in settings.settings_dict" :key="setting.id">
                 <form @submit.prevent="handleSubmit(setting.name)">
                     <div class="form-group">
                         <label for="settingvalue">{{setting.id + '. ' + setting.description + ': '}}</label>
@@ -40,7 +40,8 @@ export default {
     methods: {
         handleSubmit (settingname) {
             //const  settingvalue = this.$store.state.settings.all.settings.find(x => x.name == settingname).value;
-            const  settingvalue = this.settings.settings.find(x => x.name == settingname).value;
+//            const  settingvalue = this.settings.settings.find(x => x.name == settingname).value;
+            const  settingvalue = this.settings.settings_dict[settingname].value;
             const { dispatch } = this.$store;
             if (settingname) {
                 dispatch('settings/updating', { settingname, settingvalue });
