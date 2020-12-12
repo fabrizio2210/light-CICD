@@ -6,6 +6,7 @@ import { authentication } from "./authentication.module";
 import { users } from "./users.module";
 import { projects } from "./projects.module";
 import { settings } from "./settings.module";
+import { executions } from "./executions.module";
 
 Vue.use(Vuex);
 
@@ -15,6 +16,7 @@ const store = new Vuex.Store({
     authentication,
     users,
     projects,
+    executions,
     settings
   }
 });

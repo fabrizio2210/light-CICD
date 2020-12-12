@@ -3,6 +3,7 @@ import VueRouter from "vue-router";
 
 import HomePage from "../views/HomePage.vue";
 import GeneralSettings from "../views/GeneralSettings.vue";
+import ProjectExecutions from "../views/ProjectExecutions.vue";
 import LoginPage from "../views/Login.vue";
 
 Vue.use(VueRouter);
@@ -12,6 +13,11 @@ const routes = [
     path: "/",
     name: "Home",
     component: HomePage
+  },
+  {
+    path: "/projects/:project_id",
+    name: "Executions",
+    component: ProjectExecutions
   },
   {
     path: "/settings",
