@@ -45,7 +45,9 @@ export default {
     },
     created () {
         const project_id = this.$route.params.project_id;
-        this.$store.dispatch('projects/get', { project_id });
+        if (!this.project){
+            this.$store.dispatch('projects/get', { project_id });
+        }
         this.$store.dispatch('executions/getAll', { project_id });
     }
 };
