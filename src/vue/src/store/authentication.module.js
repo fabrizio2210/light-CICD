@@ -1,5 +1,6 @@
 import { userService } from "../services";
 import router from "../router";
+import Vue from "vue";
 
 const user = JSON.parse(localStorage.getItem("user"));
 const initialState = user
@@ -47,7 +48,7 @@ export const authentication = {
       state.user = null;
     },
     refresh(state, token) {
-      state.user.access_token = token;
+      Vue.set(state.user, 'access_token', token);
     },
     logout(state) {
       state.status = {};
