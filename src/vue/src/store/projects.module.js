@@ -1,9 +1,10 @@
 import { projectService } from "../services";
+import Vue from "vue";
 
 export const projects = {
   namespaced: true,
   state: {
-    all: {},
+    all: { projects_dict : {} },
     status : {}
   },
   actions: {
@@ -26,6 +27,14 @@ export const projects = {
         projects => commit("getAllSuccess", projects["projects"]),
         error => commit("getAllFailure", error)
       );
+    },
+    get({ commit }, { project_id}) {
+      commit("getRequest");
+
+      projectService.get(project_id).then(
+        project => commit("getSuccess", project["project"]),
+        error => commit("getFailure", error)
+      );
     }
   },
   mutations: {
@@ -34,7 +43,7 @@ export const projects = {
     },
     creatingSuccess(state, project) {
       state.status = { created: true };
-      state.all.projects.push(project);
+      state.all.projects_dict[project.id] = project;
     },
     creatingFailure(state) {
       state.status = {};
@@ -43,10 +52,23 @@ export const projects = {
     getAllRequest(state) {
       state.all = { loading: true };
     },
+    getRequest(state) {
+      state.all.loading = true ;
+    },
     getAllSuccess(state, projects) {
-      state.all = { projects };
+      const projects_dict = {}
+      projects.forEach((element) => projects_dict[element.id] = element);
+      state.all = { projects_dict };
+    },
+    getSuccess(state, project) {
+      console.log(project);
+      Vue.set(state.all.projects_dict, project.id, project);
+      Vue.delete(state.all, 'loading');
     },
     getAllFailure(state, error) {
+      state.all = { error };
+    },
+    getFailure(state, error) {
       state.all = { error };
     }
   }

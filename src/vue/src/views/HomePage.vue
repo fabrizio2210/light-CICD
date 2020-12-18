@@ -15,9 +15,10 @@
         <em v-if="projects.loading">Loading projects...</em>
         <img v-show="projects.loading" src="../assets/loading.gif" />
         <span v-if="projects.error" class="text-danger">ERROR: {{projects.error}}</span>
-        <ul v-if="projects.projects">
-            <li v-for="project in projects.projects" :key="project.id">
+        <ul v-if="projects.projects_dict">
+            <li v-for="project in projects.projects_dict" :key="project.id">
                 {{project.id + '. ' + project.name}}
+                <router-link :to="'/projects/' + project.id" >view executions</router-link>
             </li>
         </ul>
     </div>

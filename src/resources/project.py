@@ -23,7 +23,7 @@ class Project(Resource):
   def get(self, id):
     project = ProjectModel.find_by_id(id)
     if project:
-      return project[0].json()
+      return {'project' : project[0].json() }
     return {'message': 'Item not found'}, 404
 
   def delete(self, id):

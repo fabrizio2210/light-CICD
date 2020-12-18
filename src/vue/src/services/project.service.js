@@ -6,6 +6,7 @@ config.apiUrl = "";
 
 export const projectService = {
   create,
+  get,
   getAll
 };
 
@@ -16,6 +17,17 @@ function getAll() {
   };
 
   return fetch(`${config.apiUrl}/api/v1/projects`, requestOptions).then(
+    handleResponse
+  );
+}
+
+function get(project_id) {
+  const requestOptions = {
+    method: "GET",
+    headers: authHeader()
+  };
+
+  return fetch(`${config.apiUrl}/api/v1/project/${project_id}`, requestOptions).then(
     handleResponse
   );
 }

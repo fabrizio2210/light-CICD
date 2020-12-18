@@ -15,7 +15,7 @@ from models.setting import SettingModel
 from shlex import quote
 
 def preexec_function():
-  # Ignore sighup signal
+  # Protect the the external execution from SIGHUP
   signal.signal(signal.SIGHUP, signal.SIG_IGN)
 
 class ExecutionOutputModel():
@@ -236,6 +236,12 @@ class ExecutionModel():
         data = f.read(buffer_len)
         return ExecutionOutputModel(first_byte, first_byte + buffer_len, size, data)
     return None
+
+  @classmethod
+  def cleanup(cls):
+    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
+    if Path(projects_dirs[0].value).is_dir():
+      shutil.rmtree(projects_dirs[0].value)
 
   @classmethod
   def getUniqueID(cls, project_id):

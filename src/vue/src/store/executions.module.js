@@ -1,17 +1,18 @@
 import { executionService } from "../services";
+import Vue from "vue";
 
 export const executions = {
   namespaced: true,
   state: {
-    all: {},
+    all: { executions_dicts : {} },
     status : {}
   },
   actions: {
     executing({ dispatch, commit }, { project_id }) {
       commit("executingRequest", { });
-        executionService.execute(project_id).then(
+        executionService.exec(project_id).then(
           execution => {
-            commit("executingSuccess", execution);
+            commit("executingSuccess", execution["execution"]);
           },
           error => {
             commit("executingFailure", error);
@@ -20,10 +21,10 @@ export const executions = {
         );
       },
     getAll({ commit }, { project_id }) {
-      commit("getAllRequest");
+      commit("getAllRequest",  project_id );
 
       executionService.getAll(project_id).then(
-        executions => commit("getAllSuccess", executions["executions"]),
+        executions => commit("getAllSuccess", { executions, project_id }),
         error => commit("getAllFailure", error)
       );
     }
@@ -34,23 +35,23 @@ export const executions = {
     },
     executingSuccess(state, execution) {
       state.status = { executed: true };
-      state.all.executions_dicts[execution.project_id][execution.id] = execution;
+      Vue.set(state.all.executions_dicts[execution.project_id]['executions'], execution.id, execution);
     },
     executingFailure(state) {
       state.status = {};
       state.user = null;
     },
-    getAllRequest(state) {
-      state.all = { loading: true };
+    getAllRequest(state, project_id) {
+      Vue.set(state.all.executions_dicts, project_id, { loading: true });
     },
-    getAllSuccess(state, executions) {
-      //const executions_dict = {}
-      //executions.forEach((element) => executions_dict[element.name] = element);
-      //state.all = { executions_dict };
-      //TODO verify if it works
-      executions.forEach((element) => state.all.executions_dicts[element.project_id][element.name] = element);
-      console.log(executions);
-      console.log(state.all);
+    getAllSuccess(state, p) {
+      var executions = p.executions["executions"];
+      executions.forEach(function(element) {
+        !(element.project_id in state.all.executions_dicts) && (Vue.set(state.all.executions_dicts, element.project_id, {}));
+        !('executions' in state.all.executions_dicts[element.project_id]) && (Vue.set(state.all.executions_dicts[element.project_id], 'executions', {}));
+         Vue.set(state.all.executions_dicts[element.project_id]['executions'], element.id, element);
+      });
+      Vue.delete(state.all.executions_dicts[p.project_id], 'loading');
     },
     getAllFailure(state, error) {
       state.all = { error };

@@ -13,7 +13,7 @@ class Execution(Resource):
       return {'message': 'Project not found'}, 404
     executions = ExecutionModel.find_by_id_and_project_id(id, project_id)
     if executions:
-      return executions[0].json()
+      return { 'execution': executions[0].json()}
     return {'message': 'Execution not found'}, 404
 
   @jwt_required
@@ -45,7 +45,7 @@ class ExecutionOutput(Resource):
       return {'message': 'Project not found'}, 404
     exec_output = ExecutionModel.get_output(id, project_id, data['first_requested_byte'], data['last_requested_byte'])
     if exec_output:
-      return exec_output.json()
+      return { 'output': exec_output.json() }
     return {'message': 'Execution not found'}, 404
 
 
@@ -76,4 +76,4 @@ class NewExecution(Resource):
       logging.error(repr(e))
       return {"message": "An error occurred running the item."}, 500
 
-    return execution.json(), 201
+    return { 'execution': execution.json()}, 201

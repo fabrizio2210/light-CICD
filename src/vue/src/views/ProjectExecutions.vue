@@ -4,12 +4,12 @@
             <button v-on:click="handleSubmit" class="btn btn-primary" :disabled="executing" >Run now</button>
             <img v-show="executing" src="../assets/loading.gif" />
         </div>
-        <h3>Executions of the project "":</h3>
+        <h3 v-if="project" >Executions of the project "{{ project.name }}":</h3>
         <em v-if="executions.loading">Loading executions...</em>
         <img v-show="executions.loading" src="../assets/loading.gif" />
         <span v-if="executions.error" class="text-danger">ERROR: {{executions.error}}</span>
-        <ul v-if="executions.execution_dict">
-            <li v-for="execution in executions.executions_dict" :key="execution.id">
+        <ul v-if="executions.executions">
+            <li v-for="execution in executions.executions" :key="execution.id">
                 {{execution.id + '. Started:' + execution.start_time + ' Status:' + execution.rc}}
             </li>
         </ul>
@@ -28,7 +28,11 @@ export default {
         },
         executions () {
             const project_id = this.$route.params.project_id;
-            return this.$store.state.executions.all[project_id];
+            return this.$store.state.executions.all.executions_dicts[project_id];
+        },
+        project () {
+            const project_id = this.$route.params.project_id;
+            return this.$store.state.projects.all.projects_dict[project_id];
         }
     },
     methods: {
@@ -41,6 +45,7 @@ export default {
     },
     created () {
         const project_id = this.$route.params.project_id;
+        this.$store.dispatch('projects/get', { project_id });
         this.$store.dispatch('executions/getAll', { project_id });
     }
 };

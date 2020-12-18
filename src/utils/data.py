@@ -9,6 +9,7 @@ from models.user_project_map import UserProjectMap
 from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
 from db import db
+from models.execution import ExecutionModel
 
 
 def bootstrap():
@@ -60,7 +61,7 @@ def bootstrap():
   new_setting = SettingModel(id=None, 
                              name="projects_dir", 
                              description = "Directory where store projects",
-                             value = "/tmp",
+                             value = "/tmp/projects",
                              default_value = "/opt/data")
   new_setting.save()
   new_main_setting = MainSettingModel(new_setting.name, new_setting.id)
@@ -86,3 +87,6 @@ def bootstrap():
 ##############
 # Environments
 
+############
+# Executions
+  ExecutionModel.cleanup()
