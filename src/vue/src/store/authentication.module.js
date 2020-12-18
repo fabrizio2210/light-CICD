@@ -37,6 +37,7 @@ export const authentication = {
     loginRequest(state, username) {
       state.status = { loggingIn: true };
       state.user = null;
+      //TODO username should be get by the token
       state.username = username;
     },
     loginSuccess(state, user) {
