@@ -35,6 +35,8 @@ export const executions = {
     },
     executingSuccess(state, execution) {
       state.status = { executed: true };
+      !(execution.project_id in state.all.executions_dicts) && (Vue.set(state.all.executions_dicts, execution.project_id, {}));
+      !('executions' in state.all.executions_dicts[execution.project_id]) && (Vue.set(state.all.executions_dicts[execution.project_id], 'executions', {}));
       Vue.set(state.all.executions_dicts[execution.project_id]['executions'], execution.id, execution);
     },
     executingFailure(state) {
@@ -49,7 +51,7 @@ export const executions = {
       executions.forEach(function(element) {
         !(element.project_id in state.all.executions_dicts) && (Vue.set(state.all.executions_dicts, element.project_id, {}));
         !('executions' in state.all.executions_dicts[element.project_id]) && (Vue.set(state.all.executions_dicts[element.project_id], 'executions', {}));
-         Vue.set(state.all.executions_dicts[element.project_id]['executions'], element.id, element);
+        Vue.set(state.all.executions_dicts[element.project_id]['executions'], element.id, element);
       });
       Vue.delete(state.all.executions_dicts[p.project_id], 'loading');
     },

@@ -1,9 +1,10 @@
 <template>
     <div>
+        <h3 v-if="project" >{{ project.name }}</h3>
         <div id="nav">
-            <router-link :to="'/projects/' + project.id">Executions</router-link> |
-            <router-link :to="'/projects/' + project.id + '/environments'">Environment</router-link> |
-            <router-link :to="'/projects/' + project.id + '/settings'">Settings</router-link>
+            <router-link v-if="project" :to="'/projects/' + project.id">Executions</router-link> |
+            <router-link v-if="project" :to="'/projects/' + project.id + '/environments'">Environment</router-link> |
+            <router-link v-if="project" :to="'/projects/' + project.id + '/settings'">Settings</router-link>
         </div>
     <router-view />
     </div>
@@ -27,7 +28,6 @@ export default {
         if (!this.project){
             this.$store.dispatch('projects/get', { project_id });
         }
-        this.$store.dispatch('executions/getAll', { project_id });
     }
 };
 </script>
