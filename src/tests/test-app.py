@@ -192,22 +192,24 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     rv = self.app.get('/api/v1/project/1/setting/scm_url', headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": "scm_url", 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting": {
+      "name": "scm_url", 
       "id": None, 
       "description": "Source Control Manager URL of the project",
       "value": None,
-      "default_value": None })
+      "default_value": None }})
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Put setting of first project
     payload = { "value": value }
     rv = self.app.put('/api/v1/project/1/setting/scm_url', json = payload, headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": "scm_url", 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
+      {"name": "scm_url", 
       "id": 6, 
       "description": "Source Control Manager URL of the project",
       "value": value,
-      "default_value": None })
+      "default_value": None }})
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create second project as second user
     rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
@@ -254,11 +256,12 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     rv = self.app.put('/api/v1/project/1/setting/scm_url', json = payload, headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": "scm_url", 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
+      {"name": "scm_url", 
       "id": 6, 
       "description": "Source Control Manager URL of the project",
       "value": value,
-      "default_value": None })
+      "default_value": None }})
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Try to modify as second user
     rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})
@@ -273,11 +276,12 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     rv = self.app.get('/api/v1/project/1/setting/scm_url', headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": "scm_url", 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
+      {"name": "scm_url", 
       "id": 6, 
       "description": "Source Control Manager URL of the project",
       "value": value,
-      "default_value": None })
+      "default_value": None }})
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
 
 ##############################
@@ -391,7 +395,7 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
     rv = self.app.delete('/api/v1/project/environment/1', headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    # Get setting of first project as fisrt user
+    # Get environments of first project as fisrt user
     rv = self.app.get('/api/v1/project/environment/1', headers = self.headers)
     try: self.assertEqual(rv.status, '404 NOT FOUND')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
@@ -400,7 +404,7 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
     rv = self.app.put('/api/v1/project/environment/1', json = payload, headers = self.headers)
     try: self.assertEqual(rv.status, '404 NOT FOUND')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    # Try to get setting of the second as first user
+    # Try to get environments of the second as first user
     rv = self.app.get('/api/v1/project/environemnt/2', headers = self.headers)
     try: self.assertEqual(rv.status, '404 NOT FOUND')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 

@@ -30,7 +30,7 @@ class ProjectSetting(Resource):
     if setting is None:
       return {'message': "The name of the setting does not exist"}, 404
 
-    return setting.json()
+    return {'setting': setting.json()}
 
   @jwt_required
   def put(self, project_id, name):
@@ -66,7 +66,7 @@ class ProjectSetting(Resource):
         setting.delete_from_db()
         return {'message': "An error occurred mapping the setting to the project"}, 500
 
-    return setting.json()
+    return {'setting': setting.json()}
 
 
 class ProjectSettingList(Resource):
