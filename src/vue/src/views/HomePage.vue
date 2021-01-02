@@ -18,7 +18,7 @@
         <ul v-if="projects.projects_dict">
             <li v-for="project in projects.projects_dict" :key="project.id">
                 {{project.id + '. ' + project.name}}
-                <router-link :to="'/projects/' + project.id" >view executions</router-link>
+                <router-link :to="'/projects/' + project.id" >view</router-link>
             </li>
         </ul>
     </div>
