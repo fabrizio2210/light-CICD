@@ -22,6 +22,10 @@ Page of the project identified by id_project
 
 Page where change the settings of the id_project project
 
+### /web/projects/<id_project>/environments 
+
+Page where change the environment of the id_project project
+
 
 
 ## Backend API
