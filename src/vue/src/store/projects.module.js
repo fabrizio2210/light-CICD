@@ -1,5 +1,6 @@
 import { projectService } from "../services";
 import Vue from "vue";
+import router from '../router/';
 
 export const projects = {
   namespaced: true,
@@ -9,10 +10,14 @@ export const projects = {
   },
   actions: {
     creating({ dispatch, commit }, { projectname }) {
-      commit("creatingRequest", { });
+      commit("creatingRequest", {});
         projectService.create(projectname).then(
           project => {
             commit("creatingSuccess", project);
+            router.push({
+              name: 'ProjectSettings',
+              params: { project_id: project.id }
+            });
           },
           error => {
             commit("creatingFailure", error);
