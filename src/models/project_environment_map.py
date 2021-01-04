@@ -4,7 +4,7 @@ from models.environment import EnvironmentModel
 
 class ProjectEnvironmentMap(db.Model):
   project_id = db.Field(_type = "integer")
-  environment_id = db.Field(_type = "integer")
+  environment_id = db.Field(_type = "integer", primary_key = True)
   name = db.Field(_type = "string")
   __tablename__ = "project_environment_map"
 
@@ -24,7 +24,7 @@ class ProjectEnvironmentMap(db.Model):
     return cls.find(project_id=project_id)
 
   @classmethod
-  def find_project_id_by_environment_id(cls, environment_id):
+  def find_projectmaps_id_by_environment_id(cls, environment_id):
     return cls.find(environment_id=environment_id)
 
   @classmethod

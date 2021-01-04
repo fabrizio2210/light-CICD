@@ -110,11 +110,27 @@ class db():
       
       attrs = self.get_attrs()
       attrs.sort()
-      attrs = [ a for a in attrs if not use_id or not a[0] == id_col]
-      row = (*[a[1] for a in attrs],)
 
       # Build query for insertion
+      rowcount = 0
       if use_id:
+        # if the row to update exists
+        query = "SELECT * FROM {table} WHERE {id_col} = {id_value}".format(table=self.__tablename__, id_col=id_col, id_value=id_value)
+        # Execution of the preselect
+        logging.debug("====== Start Preselect Query ======")
+        logging.debug(query)
+        connection = sqlite3.connect(db.db_file)
+        cursor = connection.cursor()
+        result = cursor.execute(query)
+        connection.commit()
+        rowcount = len(result.fetchall())
+        connection.close()
+        logging.debug("====== Stop Preselect Query ======")
+        logging.debug("rowcount: %d, rowid: %d" % (rowcount, cursor.lastrowid))
+
+      if use_id and rowcount > 0:
+        # remove the primary_key column if using UPDATE
+        attrs = [ a for a in attrs if not a[0] == id_col]
         ph = ""
         for attr in attrs:
           ph +=  " %s = ?," % attr[0]
@@ -124,6 +140,7 @@ class db():
         ph = "(" + ",".join(['?']*len(attrs)) + ")"
         query = "INSERT INTO {table} VALUES {placeholder}".format(table=self.__tablename__, placeholder=ph)
 
+      row = (*[a[1] for a in attrs],)
       # Execution of the query
       logging.debug("====== Start Query ======")
       logging.debug(query)
@@ -179,3 +196,4 @@ class db():
       cursor.execute(query, (*list_args,))
       connection.commit()
       connection.close()
+      logging.debug("rowcount: %d, rowid: %d" % (cursor.rowcount, cursor.lastrowid))

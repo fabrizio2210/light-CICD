@@ -1,4 +1,6 @@
 import copy
+import sys
+import logging
 from flask_restful import Resource, reqparse
 from flask_jwt import current_identity
 from flask_jwt_extended import jwt_required, get_jwt_identity
@@ -51,25 +53,29 @@ class Environment(Resource):
   @jwt_required
   def put(self, id):
     # Check the owner
-    project_maps = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
-    owner_project_maps = UserProjectMap.find_user_id_by_project_id(project_maps[0].project_id)
-    if get_jwt_identity() != owner_project_maps[0].user_id:
-      return {'message': "You must be the owner of the project"}, 403
+    project_maps = ProjectEnvironmentMap.find_projectmaps_id_by_environment_id(id)
+    if project_maps:
+      owner_project_maps = UserProjectMap.find_user_id_by_project_id(project_maps[0].project_id)
+      if get_jwt_identity() != owner_project_maps[0].user_id:
+        return {'message': "You must be the owner of the project"}, 403
 
-    # Update the db
-    envs = EnvironmentModel.find_by_id(id)
-    if envs:
-      data = Environment.parser.parse_args()
-      env = envs[0]
-      #TODO Can we iterate on the parameters?
-      if data.get('name', None) is not None:
-        env.name = data['name']
-      if data.get('value', None) is not None:
-        env.value = data['value']
-      if data.get('description', None) is not None:
-        env.description = data['description']
-      env.save_to_db()
-      return {'environment': env.json()}
+      # Update the db
+      envs = EnvironmentModel.find_by_id(id)
+      if envs:
+        data = Environment.parser.parse_args()
+        env = envs[0]
+        project_map = project_maps[0]
+        #TODO Can we iterate on the parameters?
+        if data.get('name', None) is not None:
+          project_map.name = data['name']
+          env.name = data['name']
+        if data.get('value', None) is not None:
+          env.value = data['value']
+        if data.get('description', None) is not None:
+          env.description = data['description']
+        project_map.save_to_db()
+        env.save_to_db()
+        return {'environment': env.json()}
     return {'message': 'Environment not found.'}, 404
 
 
@@ -127,7 +133,7 @@ class NewEnvironment(Resource):
     try:
       env.save_to_db()
     except Exception as e:
-      print(e)
+      logging.error(e)
       return {"message": "An error occurred inserting the env."}, 500
 
     # Map the env to the project
@@ -135,6 +141,7 @@ class NewEnvironment(Resource):
     try:
       mapping_project.save_to_db()
     except:
+      logging.error(sys.exc_info())
       env.delete_from_db()
       return {"message": "An error occurred mapping the environment to the project."}, 500
     return {'environment': env.json()}, 201
