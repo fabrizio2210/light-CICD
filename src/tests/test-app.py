@@ -330,11 +330,11 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
     rv = self.app.post('/api/v1/project/1/new_environment', json = payload, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), {
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environment": {
       "id": 1, 
       "description": None,
       "value": value,
-      "name": name })
+      "name": name }})
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Create second project 
     rv = self.app.post("/api/v1/new_project", json = {"name": prj_name2}, headers = self.headers)
@@ -370,17 +370,18 @@ class TestAPI_EnvironmentAsUser(unittest.TestCase):
     rv = self.app.post("/api/v1/new_project", json = {"name": prj_name}, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": prj_name, "id": 1})
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), {"name": prj_name, "id": 1})
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Post environment
     payload = { "name": name, "value": value }
     rv = self.app.post('/api/v1/project/1/new_environment', json = payload, headers = self.headers)
     try: self.assertEqual(rv.status, '201 CREATED')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
-    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "name": name, 
+    try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "environment": {
+      "name": name, 
       "id": 1, 
       "description": None,
-      "value": value, })
+      "value": value, }})
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Try to modify as second user
     rv = self.app.post('/api/auth', json = { "username": second_user, "password": second_password})

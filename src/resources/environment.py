@@ -30,7 +30,7 @@ class Environment(Resource):
   def get(self, id):
     envs = EnvironmentModel.find_by_id(id)
     if envs:
-      return envs[0].json()
+      return {'environment': envs[0].json()}
     return {'message': 'Environment not found'}, 404
 
   @jwt_required
@@ -68,7 +68,7 @@ class Environment(Resource):
       if data.get('description', None):
         env.description = data['description']
       env.save_to_db()
-      return env.json()
+      return {'environment': env.json()}
     return {'message': 'Environment not found.'}, 404
 
 
@@ -97,12 +97,12 @@ class NewEnvironment(Resource):
   parser.add_argument('value',
                       type=str,
                       required=False,
-                      help="This field cannot be left blank!"
+                      help="Value of the environment variable"
                       )
   parser.add_argument('description',
                       type=str,
                       required=False,
-                      help="This field cannot be left blank!"
+                      help="Description of the environment variable"
                       )
 
   @jwt_required
@@ -136,4 +136,4 @@ class NewEnvironment(Resource):
     except:
       env.delete_from_db()
       return {"message": "An error occurred mapping the environment to the project."}, 500
-    return env.json(), 201
+    return {'environment': env.json()}, 201
