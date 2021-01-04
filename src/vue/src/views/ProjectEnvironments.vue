@@ -15,6 +15,11 @@
         <img v-show="environments.loading" src="../assets/loading.gif" />
         <span v-if="environments.error" class="text-danger">ERROR: {{environments.error}}</span>
         <ul v-if="environments.environments">
+            <li>
+                <span>Name</span>
+                <span>Value</span>
+                <span>Description</span>
+            </li>
             <li v-for="env in environments.environments" :key="env.id">
                 <form @submit.prevent="handleSubmit(env.id)">
                     <div class="form-group">
