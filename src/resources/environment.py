@@ -60,12 +60,13 @@ class Environment(Resource):
     envs = EnvironmentModel.find_by_id(id)
     if envs:
       data = Environment.parser.parse_args()
+      env = envs[0]
       #TODO Can we iterate on the parameters?
-      if data.get('name', None):
+      if data.get('name', None) is not None:
         env.name = data['name']
-      if data.get('value', None):
+      if data.get('value', None) is not None:
         env.value = data['value']
-      if data.get('description', None):
+      if data.get('description', None) is not None:
         env.description = data['description']
       env.save_to_db()
       return {'environment': env.json()}
