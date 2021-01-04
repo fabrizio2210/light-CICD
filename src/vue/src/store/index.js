@@ -6,6 +6,7 @@ import { authentication } from "./authentication.module";
 import { users } from "./users.module";
 import { projects } from "./projects.module";
 import { projectsettings } from "./projectsettings.module";
+import { projectenvironments } from "./projectenvironments.module";
 import { settings } from "./settings.module";
 import { executions } from "./executions.module";
 
@@ -17,6 +18,7 @@ const store = new Vuex.Store({
     authentication,
     users,
     projects,
+    projectenvironments,
     projectsettings,
     executions,
     settings

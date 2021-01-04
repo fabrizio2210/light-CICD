@@ -4,6 +4,7 @@ import VueRouter from "vue-router";
 import HomePage from "../views/HomePage.vue";
 import GeneralSettings from "../views/GeneralSettings.vue";
 import ProjectExecutions from "../views/ProjectExecutions.vue";
+import ProjectEnvironments from "../views/ProjectEnvironments.vue";
 import ProjectSettings from "../views/ProjectSettings.vue";
 import Project from "../views/Project.vue";
 import LoginPage from "../views/Login.vue";
@@ -24,6 +25,11 @@ const routes = [
         path: '',
         name: "Executions",
         component: ProjectExecutions
+      },
+      {
+        path: 'environments',
+        name: "ProjectEnvironments",
+        component: ProjectEnvironments
       },
       {
         path: 'settings',
