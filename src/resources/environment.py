@@ -59,10 +59,14 @@ class Environment(Resource):
       if get_jwt_identity() != owner_project_maps[0].user_id:
         return {'message': "You must be the owner of the project"}, 403
 
+      data = Environment.parser.parse_args()
+      # Check if the environment already exists
+      if ProjectEnvironmentMap.find_environment_id_by_project_and_name(project_maps[0].project_id, data['name']):
+        return {'message': "A variable with this name for this project already esists"}, 400
+
       # Update the db
       envs = EnvironmentModel.find_by_id(id)
       if envs:
-        data = Environment.parser.parse_args()
         env = envs[0]
         project_map = project_maps[0]
         #TODO Can we iterate on the parameters?
