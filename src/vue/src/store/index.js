@@ -9,6 +9,7 @@ import { projectsettings } from "./projectsettings.module";
 import { projectenvironments } from "./projectenvironments.module";
 import { settings } from "./settings.module";
 import { executions } from "./executions.module";
+import { executionoutputs } from "./executionoutputs.module";
 
 Vue.use(Vuex);
 
@@ -21,6 +22,7 @@ const store = new Vuex.Store({
     projectenvironments,
     projectsettings,
     executions,
+    executionoutputs,
     settings
   }
 });

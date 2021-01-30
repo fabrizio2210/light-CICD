@@ -10,6 +10,7 @@
         <ul v-if="executions.executions">
             <li v-for="execution in executions.executions" :key="execution.id">
                 {{execution.id + '. Started:' + execution.start_time + ' Status:' + execution.rc}}
+                <router-link :to="'/projects/' + project_id + '/executions/' + execution.id + '/output'">output</router-link>
             </li>
         </ul>
     </div>
@@ -24,6 +25,9 @@ export default {
     computed: {
         executing () {
             return this.$store.state.executions.status.executing;
+        },
+        project_id () {
+            return this.$route.params.project_id;
         },
         executions () {
             const project_id = this.$route.params.project_id;

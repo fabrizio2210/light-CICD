@@ -6,6 +6,7 @@ import GeneralSettings from "../views/GeneralSettings.vue";
 import ProjectExecutions from "../views/ProjectExecutions.vue";
 import ProjectEnvironments from "../views/ProjectEnvironments.vue";
 import ProjectSettings from "../views/ProjectSettings.vue";
+import ExecutionOutput from "../views/ExecutionOutput.vue";
 import Project from "../views/Project.vue";
 import LoginPage from "../views/Login.vue";
 
@@ -18,13 +19,18 @@ const routes = [
     component: HomePage
   },
   {
-    path: "/projects/:project_id",
+    path: '/projects/:project_id',
     component: Project,
     children: [
       {
         path: '',
         name: "Executions",
-        component: ProjectExecutions
+        component: ProjectExecutions,
+      },
+      {
+        path: 'executions/:exec_id/output',
+        name: 'ExecutionOutput',
+        component: ExecutionOutput
       },
       {
         path: 'environments',

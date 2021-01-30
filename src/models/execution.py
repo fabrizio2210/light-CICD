@@ -230,6 +230,8 @@ class ExecutionModel():
     file_to_read_path = Path(file_to_read)
     if file_to_read_path.is_file():
       size = file_to_read_path.stat().st_size
+      if last_byte == -1:
+        last_byte = size
       with open(file_to_read, "r") as f:
         buffer_len = last_byte - first_byte
         first_byte = f.seek(first_byte)
