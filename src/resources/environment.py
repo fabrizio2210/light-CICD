@@ -38,7 +38,7 @@ class Environment(Resource):
   @jwt_required
   def delete(self, id):
     # Check the owner
-    project_maps = ProjectEnvironmentMap.find_project_id_by_environment_id(id)
+    project_maps = ProjectEnvironmentMap.find_projectmaps_id_by_environment_id(id)
     owner_project_maps = UserProjectMap.find_user_id_by_project_id(project_maps[0].project_id)
     if get_jwt_identity() != owner_project_maps[0].user_id:
       return {'message': "You must be the owner of the project"}, 403
