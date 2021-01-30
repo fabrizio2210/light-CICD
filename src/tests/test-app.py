@@ -511,8 +511,8 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     time.sleep(1)
     first_byte = 0
     last_byte = 200
-    payload = { "first_requested_byte": first_byte, "last_requested_byte": last_byte}
-    rv = self.app.get('/api/v1/project/1/execution/' + str(execution_id) + "/output", json = payload, headers = self.headers)
+    payload = "first_requested_byte=" + str(first_byte) + "&last_requested_byte=" + str(last_byte)
+    rv = self.app.get('/api/v1/project/1/execution/' + str(execution_id) + "/output?" + payload, headers = self.headers)
     try: self.assertEqual(rv.status, '200 OK')
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     response = json.loads(rv.data.decode("utf-8"))

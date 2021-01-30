@@ -30,11 +30,13 @@ class ExecutionOutput(Resource):
   parser.add_argument('first_requested_byte',
                       type=int,
                       required=True,
+                      location='args',
                       help="Express the first byte to retrieve"
                       )
   parser.add_argument('last_requested_byte',
                       type=int,
                       required=True,
+                      location='args',
                       help="Express the last byte to retrieve "
                       )
 
