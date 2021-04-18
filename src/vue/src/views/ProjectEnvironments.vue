@@ -25,7 +25,7 @@
                     <div class="form-group">
                         <label for="envname">{{ env.id + ': '}}</label>
                         <input type="text" v-on:keydown="env.untouched=false" v-model="env.name" name="envname" class="form-control" />
-                        <input type="text" v-on:keydown="env.untouched=false" v-model="env.value" name="envvalue" class="form-control" />
+                        <textarea v-on:keydown="env.untouched=false" v-model="env.value" name="envvalue" class="form-control" rows="1" />
                         <input type="text" v-on:keydown="env.untouched=false" v-model="env.description" name="envdescription" class="form-control" />
                         <button class="btn btn-primary" :disabled="env.untouched||updating" >Update</button>
                     </div>
