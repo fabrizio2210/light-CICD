@@ -41,6 +41,8 @@ class ExecutionModel():
   commandline = None
   project_id = None
   project_dir_format = "{root_dir}/{prj}"
+  project_repo_dir_format = "{root_dir}/{prj}/repo"
+  central_repo_dir_format = "{root_dir}/repo"
   exec_dir_format    = "{root_dir}/{prj}/{exc:0>20}"
 
   def __init__(self, project_id, id = None, commandline = None, start_time = None, rc = None, stop_time = None, settings = None):
@@ -97,11 +99,16 @@ class ExecutionModel():
     exec_dir = self.exec_dir_format.format(root_dir=projects_dir.value,
                   prj=self.project_id,
                   exc=self.id)
+    project_repo_dir = self.project_repo_dir_format.format(root_dir=projects_dir.value,
+                  prj=self.project_id)
+    central_repo_dir = self.central_repo_dir_format.format(root_dir=projects_dir.value)
 
     # Creation of the environment
     envs = ProjectEnvironmentMap.get_environments_by_project_id(self.project_id)
     if manual:
       envs.append(EnvironmentModel(id=None, name="MANUAL_TRIGGER", value="1"))
+    envs.append(EnvironmentModel(id=None, name="PROJECT_REPOSITORY", value=project_repo_dir))
+    envs.append(EnvironmentModel(id=None, name="REPOSITORY", value=central_repo_dir))
     d_envs = []
     for env in envs:
       d_envs.append("--env")
