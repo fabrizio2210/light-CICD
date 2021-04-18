@@ -7,8 +7,8 @@
         <em v-if="output.loading">Loading output...</em>
         <img v-show="output.loading" src="../assets/loading.gif" />
         <span v-if="output.error" class="text-danger">ERROR: {{output.error}}</span>
-        <div v-if="output.output">
-            {{ output.output }}
+        <div class="output" v-if="output.output">
+            {{ output.output.data }}
         </div>
     </div>
 </template>
