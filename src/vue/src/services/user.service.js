@@ -4,7 +4,8 @@ config.apiUrl = "";
 
 export const userService = {
   login,
-  logout
+  logout,
+  refresh
 };
 
 function login(username, password) {
@@ -30,6 +31,28 @@ function login(username, password) {
 function logout() {
   // remove user from local storage to log user out
   localStorage.removeItem("user");
+}
+
+function refresh(refresh_token) {
+  const requestOptions = {
+    method: "POST",
+    headers: new Headers({
+      'Authorization': `JWT ${refresh_token}`
+    })
+  };
+
+  return fetch(`${config.apiUrl}/api/refresh`, requestOptions)
+    .then(handleResponse)
+    .then(access_token => {
+      // login successful if there's a jwt token in the response
+      if (access_token) {
+        var user = JSON.parse(localStorage.getItem("user"));
+        // store user details and jwt token in local storage to keep user logged in between page refreshes
+        user.access_token = access_token['access_token'];
+        localStorage.setItem("user", JSON.stringify(user));
+      }
+      return access_token;
+    });
 }
 
 function handleResponse(response) {

@@ -31,17 +31,8 @@ export default {
     async refreshJWT() {
       if (this.auth.user) {
         if (this.auth.user.refresh_token) {
-          // Error handling and such omitted here for simplicity.
-          const res = await fetch(`/api/refresh`,{
-            method: 'POST',
-            headers: new Headers({
-              'Authorization': `JWT ${this.auth.user.refresh_token}`
-            }),
-          });
-          var jwt = await res.json();
-          var new_token = jwt['access_token']
-          this.$store.dispatch('authentication/token_refresh',  new_token );
-          //this.access_token= jwt['access_token'];
+          const refresh_token = this.auth.user.refresh_token
+          this.$store.dispatch('authentication/token_refresh',  refresh_token );
         }
       }
     },
