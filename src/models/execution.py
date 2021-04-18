@@ -120,6 +120,8 @@ class ExecutionModel():
 
     # Creation of the directory structure
     Path(exec_dir).mkdir(parents=True, exist_ok=True)
+    Path(project_repo_dir).mkdir(parents=True, exist_ok=True)
+    Path(central_repo_dir).mkdir(parents=True, exist_ok=True)
 
     # Creation of the output file
     stdout_fh = open(exec_dir + "/output" , "w")
@@ -168,7 +170,9 @@ class ExecutionModel():
     if project_dir.is_dir():
       for item in project_dir.iterdir():
         if item.is_dir():
-          executions.append(cls.find_by_id_and_project_id(PurePath(item).name, project_id)[0])
+          potential_executions = cls.find_by_id_and_project_id(PurePath(item).name, project_id)
+          if potential_executions:
+            executions.append(potential_executions[0])
       
     return executions
 
