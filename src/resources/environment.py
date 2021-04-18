@@ -70,7 +70,7 @@ class Environment(Resource):
         if data.get('name', None) is not None:
           # Check if the environment already exists
           project_env_maps = ProjectEnvironmentMap.find_environment_id_by_project_and_name(project_maps[0].project_id, data['name'])
-          if project_env_maps[0].environment_id != env.id:
+          if project_env_maps and project_env_maps[0].environment_id != env.id:
             return {'message': "A variable with this name for this project already esists"}, 400
           project_map.name = data['name']
           env.name = data['name']
