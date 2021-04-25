@@ -4,11 +4,15 @@ import inspect
 import os
 
 class db():
-  db_file = "/tmp/data.db"
+  db_file = None
 
   @classmethod
   def create_tables(cls):
     pass
+
+  @classmethod
+  def set_db_filename(cls, db_filename):
+    cls.db_file = db_filename
 
   @classmethod
   def present(cls):

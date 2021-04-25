@@ -4,7 +4,10 @@ from flask_jwt_extended import JWTManager
 from flask_jwt import JWT
 from flask_cors import CORS
 import logging
+import os
 
+from db import db
+from models.execution import ExecutionModel
 from resources.user import UserRegister
 from resources.userlogin import UserLogin, TokenRefresh
 from resources.project import Project, ProjectList, NewProject
@@ -14,6 +17,11 @@ from resources.environment import EnvironmentList, Environment, NewEnvironment
 from resources.execution import Execution, NewExecution, ExecutionList, ExecutionOutput
 from utils.networking import get_my_ip
 from utils.data import bootstrap
+
+
+# Initialise from envrironment variables
+db.set_db_filename(os.getenv('DB_PATH', '/tmp/data.db'))
+ExecutionModel.set_projects_dir(os.getenv('PROJECTS_PATH', '/tmp/projects'))
 
 
 app = Flask(__name__)
@@ -56,7 +64,7 @@ api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 if __name__ == '__main__':
   logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
   logging.info('Started')
-  bootstrap(force=True)
+  bootstrap(force=True, dev=True)
   from db import db
   my_ip = get_my_ip()
   # enable CORS

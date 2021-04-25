@@ -40,6 +40,7 @@ class ExecutionModel():
   settings = None
   commandline = None
   project_id = None
+  projects_dir = None
   project_dir_format = "{root_dir}/{prj}"
   project_repo_dir_format = "{root_dir}/{prj}/repo"
   central_repo_dir_format = "{root_dir}/repo"
@@ -85,23 +86,18 @@ class ExecutionModel():
       logging.error("Docker image is Null")
       raise ValueError("Docker Image not set")
 
-    projects_dir = self.settings.get("projects_dir", None)
-    if projects_dir.value is None:
-      logging.error("The path where the projects are store is Null")
-      raise ValueError("Projects directory not set")
-
     # Initialization of the Execution
     if self.id is not None:
       logging.error("The ID is already populated")
       raise ValueError("Not possible to rexecute the same execution")
     self.id = ExecutionModel.getUniqueID(self.project_id)
     self.start_time = int(datetime.now().timestamp())
-    exec_dir = self.exec_dir_format.format(root_dir=projects_dir.value,
+    exec_dir = self.exec_dir_format.format(root_dir=ExecutionModel.projects_dir,
                   prj=self.project_id,
                   exc=self.id)
-    project_repo_dir = self.project_repo_dir_format.format(root_dir=projects_dir.value,
+    project_repo_dir = self.project_repo_dir_format.format(root_dir=ExecutionModel.projects_dir,
                   prj=self.project_id)
-    central_repo_dir = self.central_repo_dir_format.format(root_dir=projects_dir.value)
+    central_repo_dir = self.central_repo_dir_format.format(root_dir=ExecutionModel.projects_dir)
 
     # Creation of the environment
     envs = ProjectEnvironmentMap.get_environments_by_project_id(self.project_id)
@@ -168,8 +164,7 @@ class ExecutionModel():
   def find_executions_by_project_id(cls, project_id):
     #TODO implement a limit of executions
     executions = []
-    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
-    project_dir = Path(cls.project_dir_format.format(root_dir=projects_dirs[0].value,
+    project_dir = Path(cls.project_dir_format.format(root_dir=cls.projects_dir,
                   prj=project_id))
     if project_dir.is_dir():
       for item in project_dir.iterdir():
@@ -183,8 +178,7 @@ class ExecutionModel():
   @classmethod
   def find_by_id_and_project_id(cls, id, project_id):
     executions = []
-    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
-    exec_dir = cls.exec_dir_format.format(root_dir=projects_dirs[0].value,
+    exec_dir = cls.exec_dir_format.format(root_dir=cls.projects_dir,
                   prj=project_id,
                   exc=id)
     if Path(exec_dir).is_dir():
@@ -215,8 +209,7 @@ class ExecutionModel():
   
   @classmethod
   def delete_by_id_and_project_id(cls, id, project_id):
-    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
-    exec_dir = cls.exec_dir_format.format(root_dir=projects_dirs[0].value,
+    exec_dir = cls.exec_dir_format.format(root_dir=cls.projects_dirs,
                   prj=project_id,
                   exc=id)
     if Path(exec_dir).is_dir():
@@ -237,8 +230,7 @@ class ExecutionModel():
     
   @classmethod
   def get_output(cls, id, project_id, first_byte, last_byte):
-    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
-    exec_dir = cls.exec_dir_format.format(root_dir=projects_dirs[0].value,
+    exec_dir = cls.exec_dir_format.format(root_dir=cls.projects_dir,
                   prj=project_id,
                   exc=id)
     file_to_read = exec_dir + "/output"
@@ -256,9 +248,12 @@ class ExecutionModel():
 
   @classmethod
   def cleanup(cls):
-    projects_dirs = MainSettingModel.get_setting_by_name("projects_dir")
-    if Path(projects_dirs[0].value).is_dir():
-      shutil.rmtree(projects_dirs[0].value)
+    if Path(cls.projects_dir).is_dir():
+      shutil.rmtree(cls.projects_dir)
+
+  @classmethod
+  def set_projects_dir(cls, projects_dir):
+    cls.projects_dir = projects_dir
 
   @classmethod
   def getUniqueID(cls, project_id):
