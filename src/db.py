@@ -11,6 +11,12 @@ class db():
     pass
 
   @classmethod
+  def present(cls):
+    if os.path.isfile(cls.db_file):
+      return True
+    return False
+
+  @classmethod
   def delete_all(cls):
     if os.path.isfile(cls.db_file):
       os.unlink(cls.db_file)

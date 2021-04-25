@@ -23,6 +23,8 @@ app.secret_key = 'jose'
 api = Api(app)
 
 
+# Initialise data
+bootstrap(force=False)
 
 # API
 jwt = JWTManager(app)
@@ -54,7 +56,7 @@ api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 if __name__ == '__main__':
   logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
   logging.info('Started')
-  bootstrap()
+  bootstrap(force=True)
   from db import db
   my_ip = get_my_ip()
   # enable CORS

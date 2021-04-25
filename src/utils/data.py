@@ -12,7 +12,11 @@ from db import db
 from models.execution import ExecutionModel
 
 
-def bootstrap():
+def bootstrap(force=False):
+  if not force:
+    # verify and skip if it is not necessary
+    if db.present():
+      return
   db.delete_all()
   UserModel.create_table()
   UserProjectMap.create_table()
