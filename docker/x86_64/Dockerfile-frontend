@@ -1,16 +1,16 @@
 FROM debian
 MAINTAINER fabrizio2210
-ENV DOCKERVERSION=18.03.1-ce
-ENV DOCKERARCH=x86_64
 
-RUN apt-get update && apt-get install -y csync2 lsyncd sed curl procps iputils-ping && apt-get clean
+RUN apt-get update && apt-get install -y nginx \
+    npm \
+    nodejs
 
-RUN curl -fsSLO https://download.docker.com/linux/static/stable/${DOCKERARCH}/docker-${DOCKERVERSION}.tgz \
-    && tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker \
-    && rm docker-${DOCKERVERSION}.tgz
+RUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY src/* /usr/local/bin/
+ENV APP_FOLDER="/opt/web"
+COPY src/vue/ ${APP_FOLDER}/
 
-VOLUME ["/etc", "/var/lib/csync2"]
+RUN cd ${APP_FOLDER}/src/ && npm run build && cp -r ../dist/* /var/www/html/
 
-CMD /usr/local/bin/wrapper.sh
+# COMMAND
+CMD /usr/sbin/nginx -g 'daemon off;'
