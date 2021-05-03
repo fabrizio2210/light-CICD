@@ -1,6 +1,8 @@
 FROM balenalib/armv7hf-debian
 MAINTAINER fabrizio2210
 
+ENV APP_FOLDER="/opt/web"
+
 RUN [ "cross-build-start" ]
 
 RUN apt-get update && apt-get install -y nginx \
@@ -9,10 +11,14 @@ RUN apt-get update && apt-get install -y nginx \
 
 RUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/nginx/error.log
 
-ENV APP_FOLDER="/opt/web"
 COPY src/vue/ ${APP_FOLDER}/
 
-RUN cd ${APP_FOLDER}/src/ && npm run build && cp -r ../dist/* /var/www/html/
+RUN cd ${APP_FOLDER}/src/ && \
+    npm cache clean -f && \
+    rm -rf node_modules package-lock.json && \
+    npm install && \
+    npm run build && \
+    cp -r ../dist/* /var/www/html/
 
 RUN [ "cross-build-end" ]
 
