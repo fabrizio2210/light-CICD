@@ -11,7 +11,10 @@ RUN ln -sf /dev/stdout /var/log/nginx/access.log && ln -sf /dev/stderr /var/log/
 
 COPY src/vue/ ${APP_FOLDER}/
 
-RUN cd ${APP_FOLDER}/src/ && npm run build && cp -r ../dist/* /var/www/html/
+RUN cd ${APP_FOLDER}/src/ && \
+    npm cache clean -f && \
+    npm run build && \
+    cp -r ../dist/* /var/www/html/
 
 # COMMAND
 CMD /usr/sbin/nginx -g 'daemon off;'
