@@ -13,6 +13,8 @@ COPY src/vue/ ${APP_FOLDER}/
 
 RUN cd ${APP_FOLDER}/src/ && \
     npm cache clean -f && \
+    rm -rf node_modules package-lock.json && \
+    npm install && \
     npm run build && \
     cp -r ../dist/* /var/www/html/
 
