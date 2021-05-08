@@ -29,7 +29,6 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/${DOCKERARCH}/do
     && rm docker-${DOCKERVERSION}.tgz
 
 COPY src/ ${APP_FOLDER}/
-RUN mkdir ${LOG_FOLDER} && chmod 755 ${LOG_FOLDER} && chown www-data ${LOG_FOLDER}
 RUN mkdir ${ETC_FOLDER} && chmod 755 ${ETC_FOLDER} && chown www-data ${ETC_FOLDER}
 RUN mkdir ${SOCKET_FOLDER} && chmod 755 ${SOCKET_FOLDER} && chown www-data ${SOCKET_FOLDER}
 
