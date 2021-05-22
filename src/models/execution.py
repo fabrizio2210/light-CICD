@@ -209,7 +209,7 @@ class ExecutionModel():
   
   @classmethod
   def delete_by_id_and_project_id(cls, id, project_id):
-    exec_dir = cls.exec_dir_format.format(root_dir=cls.projects_dirs,
+    exec_dir = cls.exec_dir_format.format(root_dir=cls.projects_dir,
                   prj=project_id,
                   exc=id)
     if Path(exec_dir).is_dir():
