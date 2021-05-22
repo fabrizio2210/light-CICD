@@ -27,7 +27,7 @@ ExecutionModel.set_projects_dir(os.getenv('PROJECTS_PATH', '/tmp/projects'))
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['JWT_HEADER_TYPE'] = "JWT" 
-app.secret_key = 'jose'
+app.secret_key = os.getenv('JWT_SECRET', 'Qw2sGsa7ED34f6dAfgFSdLopdAdg')
 api = Api(app)
 
 
