@@ -21,7 +21,13 @@ RUN cd ${APP_FOLDER}/src/ && \
     npm run build && \
     cp -r ../dist/* /var/www/html/
 
+# NGINX
 EXPOSE 80
+
+COPY docker/lib/frontend-web-site.conf /etc/nginx/sites-available/web.conf
+RUN ln -s /etc/nginx/sites-available/web.conf /etc/nginx/sites-enabled/web.conf 
+RUN rm /etc/nginx/sites-enabled/default
+RUN rm /var/www/html/index.nginx-debian.html
 
 # COMMAND
 CMD /usr/sbin/nginx -g 'daemon off;'
