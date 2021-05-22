@@ -25,5 +25,7 @@ RUN cd ${APP_FOLDER}/src/ && \
 
 RUN [ "cross-build-end" ]
 
+EXPOSE 80
+
 # COMMAND
 CMD /usr/sbin/nginx -g 'daemon off;'

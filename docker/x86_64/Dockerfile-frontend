@@ -21,5 +21,7 @@ RUN cd ${APP_FOLDER}/src/ && \
     npm run build && \
     cp -r ../dist/* /var/www/html/
 
+EXPOSE 80
+
 # COMMAND
 CMD /usr/sbin/nginx -g 'daemon off;'

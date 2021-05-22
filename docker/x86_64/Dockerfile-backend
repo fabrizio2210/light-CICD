@@ -37,7 +37,7 @@ RUN sed -i "s|{{ socket_folder }}|$SOCKET_FOLDER|g" ${ETC_FOLDER}/uwsgi.ini
 
 # NGINX
 EXPOSE 80
-EXPOSE 443
+
 COPY docker/lib/web-site.conf /etc/nginx/sites-available/web.conf
 RUN sed -i "s|{{ socket_folder }}|$SOCKET_FOLDER|g" /etc/nginx/sites-available/web.conf
 RUN ln -s /etc/nginx/sites-available/web.conf /etc/nginx/sites-enabled/web.conf 
