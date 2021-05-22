@@ -45,7 +45,7 @@ services:
         condition: on-failure
 
   vue:
-    image: fabrizio2210/ligth_cicd-frontend
+    image: fabrizio2210/light_cicd-frontend
     labels: 
         traefik.port: 80
         traefik.enable: "true"
@@ -56,7 +56,7 @@ services:
       - backends
 
   flask:
-    image: fabrizio2210/ligth_cicd-backend
+    image: fabrizio2210/light_cicd-backend
     labels: 
       traefik.port: 80
       traefik.enable: "true"
