@@ -15,7 +15,7 @@ from db import db
 from models.execution import ExecutionModel
 
 
-def bootstrap(force=False, dev=False):
+def bootstrap(force=False, dev=False, quiet=False):
   if not force:
     # verify and skip if it is not necessary
     if db.present():
@@ -38,11 +38,12 @@ def bootstrap(force=False, dev=False):
   admin_password = ''.join(secrets.choice(alphabet) for i in range(20))
   new_user = UserModel(id=None, username="admin", password=admin_password, admin=1)
   new_user.save()
-  print(f'################### Admin user created ##################')
-  print(f'######### Admin password: "{admin_password}" ########')
-  print(f'#########################################################')
+  if not quiet:
+    print(f'################### Admin user created ##################')
+    print(f'######### Admin password: "{admin_password}" ########')
+    print(f'#########################################################')
   if dev:
-    logging.info('Creation of the developping users')
+    logging.debug('Creation of the developping users')
     new_user = UserModel(id=None, username="fabrizio", password="pwd", admin=1)
     new_user.save()
     new_user = UserModel(id=None, username="fabrizio2", password="pwd2", admin=0)

@@ -19,7 +19,7 @@ second_user = "fabrizio3"
 second_password = "pwd2"
 
 def initialize_test():
-  bootstrap()
+  bootstrap(force=True, dev=True, quiet=True)
 #########
 # General without authentication
 
@@ -206,7 +206,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
       {"name": "scm_url", 
-      "id": 6, 
+      "id": 5, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None }})
@@ -258,7 +258,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
       {"name": "scm_url", 
-      "id": 6, 
+      "id": 5, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None }})
@@ -278,7 +278,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
       {"name": "scm_url", 
-      "id": 6, 
+      "id": 5, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None }})
