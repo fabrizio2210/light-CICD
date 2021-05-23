@@ -63,6 +63,8 @@ services:
       traefik.frontend.rule: 'PathPrefix(`/api`)'
       traefik.http.services.backend-service.loadbalancer.server.port: 80
       traefik.http.routers.backend.rule: "PathPrefix(`/api`)"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks: 
       - backends
 

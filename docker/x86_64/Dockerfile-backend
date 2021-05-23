@@ -1,6 +1,6 @@
 FROM debian
 MAINTAINER fabrizio2210
-ENV DOCKERVERSION=18.03.1-ce
+ENV DOCKERVERSION=20.10.2
 ENV DOCKERARCH=x86_64
 
 ENV APP_FOLDER="/opt/web"
@@ -24,7 +24,7 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/${DOCKERARCH}/do
     && tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker \
     && rm docker-${DOCKERVERSION}.tgz
 
-RUN groupadd -g 996 docker -r && usermod -a -G docker www-data
+RUN groupadd -g 136 docker -r && usermod -a -G docker www-data
 
 COPY src/ ${APP_FOLDER}/
 RUN mkdir ${ETC_FOLDER} && chmod 755 ${ETC_FOLDER} && chown www-data ${ETC_FOLDER}

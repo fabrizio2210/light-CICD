@@ -1,6 +1,6 @@
 FROM balenalib/armv7hf-debian
 MAINTAINER fabrizio2210
-ENV DOCKERVERSION=18.03.1-ce
+ENV DOCKERVERSION=20.10.2
 ENV DOCKERARCH=armhf
 
 ENV APP_FOLDER="/opt/web"

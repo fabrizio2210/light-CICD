@@ -118,6 +118,9 @@ class ExecutionModel():
       d_envs.append("-v")
       d_envs.append(quote("{}:{}".format(central_repo_dir,central_repo_dir)))
 
+    d_envs.append("--pull")
+    d_envs.append("always")
+
     # Creation of the directory structure
     Path(exec_dir).mkdir(parents=True, exist_ok=True)
     Path(project_repo_dir).mkdir(parents=True, exist_ok=True)
