@@ -1,0 +1,31 @@
+FROM debian
+MAINTAINER fabrizio2210
+ENV DOCKERVERSION=20.10.2
+ENV DOCKERARCH=x86_64
+
+ENV APP_FOLDER="/opt/web"
+
+RUN apt-get update && apt-get install -y \
+    sed \
+    curl \
+    supervisor \
+    python3.9 \
+    python3-pip \
+    python3-setuptools \
+    python-setuptools \
+    libpcre3 \
+    libpcre3-dev \
+    && apt-get clean
+
+# Docker
+RUN curl -fsSLO https://download.docker.com/linux/static/stable/${DOCKERARCH}/docker-${DOCKERVERSION}.tgz \
+    && tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker \
+    && rm docker-${DOCKERVERSION}.tgz
+
+# Python
+COPY src/requirements.txt ${APP_FOLDER}/
+RUN pip3 install -r ${APP_FOLDER}/requirements.txt
+
+# COMMAND
+WORKDIR ${APP_FOLDER}
+CMD python3 app.py

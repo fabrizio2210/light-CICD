@@ -3,8 +3,8 @@ asyncio==3.4.3
 Click==7.0
 Flask==1.1.1
 Flask-RESTful==0.3.7
-Flask-JWT==0.3.2
-Flask-JWT-Extended==3.24.1
+Flask-JWT
+Flask-JWT-Extended
 Flask-Cors
 itsdangerous==1.1.0
 Jinja2==2.10.3

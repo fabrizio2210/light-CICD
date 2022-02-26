@@ -1,0 +1,35 @@
+version: '3.4'
+
+services:
+  vue:
+    image: fabrizio2210/light_cicd-frontend-dev
+    labels: 
+        traefik.port: 80
+        traefik.enable: "true"
+        traefik.frontend.rule: "PathPrefix(`/`)"
+        traefik.http.services.frontend-service.loadbalancer.server.port: 8080
+        traefik.http.routers.frontend.rule: "PathPrefix(`/`)"
+    volumes:
+      - ../../src/vue/src:/opt/web/src
+    networks: 
+      - backends
+
+  flask:
+    image: fabrizio2210/light_cicd-backend-dev
+    command: python3 /opt/web/tests/test-app.py
+    deploy:
+      replicas: 1
+    labels: 
+      traefik.port: 80
+      traefik.enable: "true"
+      traefik.frontend.rule: 'PathPrefix(`/api`)'
+      traefik.http.services.backend-service.loadbalancer.server.port: 5000
+      traefik.http.routers.backend.rule: "PathPrefix(`/api`)"
+    volumes:
+      - ../../src:/opt/web
+    networks: 
+      - backends
+
+networks:
+  backends:
+    driver: overlay
