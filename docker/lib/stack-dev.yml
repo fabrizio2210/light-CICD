@@ -69,6 +69,7 @@ services:
       traefik.http.routers.backend.rule: "PathPrefix(`/api`)"
     volumes:
       - ../../src:/opt/web
+      - /var/run/docker.sock:/var/run/docker.sock
     networks: 
       - backends
 
