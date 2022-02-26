@@ -32,3 +32,7 @@ class SettingModel(db.Model):
   def find_by_id(cls, id):
     return cls.find(id=id)
 
+  @classmethod
+  def find_by_name(cls, name):
+    return cls.find(name=name)
+

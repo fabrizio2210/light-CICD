@@ -15,9 +15,13 @@ from resources.project_setting import ProjectSetting, ProjectSettingList
 from resources.main_setting import MainSettingList, MainSetting
 from resources.environment import EnvironmentList, Environment, NewEnvironment
 from resources.execution import Execution, NewExecution, ExecutionList, ExecutionOutput
+from resources.github import GithubReceiver
 from utils.networking import get_my_ip
 from utils.data import bootstrap
 
+
+if __name__ == '__main__' or os.getenv('DEBUG', 0) == '1':
+  logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 # Initialise from envrironment variables
 db.set_db_filename(os.getenv('DB_PATH', '/tmp/data.db'))
@@ -60,9 +64,9 @@ api.add_resource(Execution, '/api/v1/project/<int:project_id>/execution/<int:id>
 api.add_resource(ExecutionOutput, '/api/v1/project/<int:project_id>/execution/<int:id>/output')
 api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 
+api.add_resource(GithubReceiver, '/api/v1/external/github_trigger')
 
 if __name__ == '__main__':
-  logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
   logging.info('Started')
   bootstrap(force=True, dev=True)
   from db import db

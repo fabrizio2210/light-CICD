@@ -44,7 +44,7 @@ services:
       restart_policy:
         condition: on-failure
 
-  vue:
+  vue_lightcicd:
     image: fabrizio2210/light_cicd-frontend-dev
     labels: 
         traefik.port: 80
@@ -57,7 +57,7 @@ services:
     networks: 
       - backends
 
-  flask:
+  flask_lightcicd:
     image: fabrizio2210/light_cicd-backend-dev
     deploy:
       replicas: 1
@@ -67,6 +67,9 @@ services:
       traefik.frontend.rule: 'PathPrefix(`/api`)'
       traefik.http.services.backend-service.loadbalancer.server.port: 5000
       traefik.http.routers.backend.rule: "PathPrefix(`/api`)"
+    environment:
+      DEBUG: 1
+      WEBHOOK_SECRET: dfc448942b9d1496ceeaf7f3e8ba50a6cbab126f
     volumes:
       - ../../src:/opt/web
       - /var/run/docker.sock:/var/run/docker.sock
