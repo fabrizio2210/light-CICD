@@ -13,20 +13,20 @@ class GithubReceiver(Resource):
   parser.add_argument('repository',
                       type=dict,
                       required=True)
-  parser.add_argument('hook',
-                      type=dict,
-                      required=True)
   parser.add_argument('X-Hub-Signature',
                       location='headers')
+  parser.add_argument('X-GitHub-Event',
+                      location='headers',
+                      required=True)
 
 
   def post(self):
     data = GithubReceiver.parser.parse_args()
-    hook = data['hook']
+    event = data['X-GitHub-Event']
     repository = data['repository']
     logging.info('Github webhook for: %s', repository['clone_url'])
     
-    if not 'push' in hook.get('events', []):
+    if not 'push' == event:
       return {'message': 'Not handling events different than "push"'}, 400
 
     settings = SettingModel.find_by_name('scm_url')
