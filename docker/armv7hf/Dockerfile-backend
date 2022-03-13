@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y nginx \
     curl \
     supervisor \
     gcc \
-    python3.7 \
+    python3.9 \
     python3-dev \
     python3-pip \
     python3-setuptools \
