@@ -26,6 +26,7 @@ if __name__ == '__main__' or os.getenv('DEBUG', 0) == '1':
 # Initialise from envrironment variables
 db.set_db_filename(os.getenv('DB_PATH', '/tmp/data.db'))
 ExecutionModel.set_projects_dir(os.getenv('PROJECTS_PATH', '/tmp/projects'))
+GithubReceiver.set_webhook_secret(os.getenv('WEBHOOK_SECRET', ''))
 
 
 app = Flask(__name__)
