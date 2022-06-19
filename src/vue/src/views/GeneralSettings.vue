@@ -10,7 +10,7 @@
                     <div class="form-group">
                         <label for="settingvalue">{{setting.id + '. ' + setting.description + ': '}}</label>
                         <input type="text" v-on:keydown="setting.untouched=false" v-model="setting.value" :placeholder="setting.default_value" name="settingvalue" class="form-control" />
-                        <button class="btn btn-primary" :disabled="setting.untouched||updating" >Update</button>
+                        <button class="btn btn-secondary" :disabled="setting.untouched||updating" >Update</button>
                     </div>
                 </form>
             </li>
