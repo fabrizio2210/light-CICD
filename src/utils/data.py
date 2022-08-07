@@ -93,6 +93,15 @@ def bootstrap(force=False, dev=False, quiet=False):
   new_main_setting = InitProjectSettingModel(new_setting.name, new_setting.id)
   new_main_setting.save()
 
+  new_setting = SettingModel(id=None, 
+                             name="docker_capabilities", 
+                             value = "",
+                             default_value = "",
+                             description = "Comma separated list of capabilities for Docker container")
+  new_setting.save()
+  new_main_setting = InitProjectSettingModel(new_setting.name, new_setting.id)
+  new_main_setting.save()
+
 ##############
 # Environments
 

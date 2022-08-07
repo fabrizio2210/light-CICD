@@ -80,6 +80,7 @@ class ExecutionModel():
       raise ValueError("URL of the project not set")
 
     image_use_docker = self.settings.get("image_use_docker")
+    docker_capabilities = self.settings.get("docker_capabilities")
 
     docker_image = self.settings.get("name_default_container_image", None)
     if docker_image.value is None:
@@ -120,6 +121,10 @@ class ExecutionModel():
 
     d_envs.append("--pull")
     d_envs.append("always")
+
+    for capability in docker_capabilities.value.split(","):
+      d_envs.append("--cap-add")
+      d_envs.append(quote(capability))
 
     # Creation of the directory structure
     Path(exec_dir).mkdir(parents=True, exist_ok=True)
