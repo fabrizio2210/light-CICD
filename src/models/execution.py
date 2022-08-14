@@ -135,7 +135,7 @@ class ExecutionModel():
     stdout_fh = open(exec_dir + "/output" , "w")
 
     # Creation of the internal command
-    d_command = quote("cd $(mktemp -d); git clone {} ; cd * ; ./CICD.sh".format(quote(scm_url.value)))
+    d_command = quote("cd $(mktemp -d); git clone --recurse-submodules {} ; cd * ; ./CICD.sh".format(quote(scm_url.value)))
     command_array = ["docker", 
                       "run", 
                       *d_envs,
