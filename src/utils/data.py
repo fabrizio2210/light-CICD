@@ -106,6 +106,16 @@ def bootstrap(force=False, dev=False, quiet=False):
     new_main_setting = InitProjectSettingModel(new_setting.name, new_setting.id)
     new_main_setting.save()
 
+  if not SettingModel.find_by_name("name_container_image"):
+    new_setting = SettingModel(id=None, 
+                               name="name_container_image", 
+                               value = "",
+                               default_value = "",
+                               description = "Docker image to use insted of the default one")
+    new_setting.save()
+    new_main_setting = InitProjectSettingModel(new_setting.name, new_setting.id)
+    new_main_setting.save()
+
 ##############
 # Environments
 

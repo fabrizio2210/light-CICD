@@ -80,12 +80,15 @@ class ExecutionModel():
       raise ValueError("URL of the project not set")
 
     image_use_docker = self.settings.get("image_use_docker")
+    docker_image = self.settings.get("name_container_image")
     docker_capabilities = self.settings.get("docker_capabilities")
 
-    docker_image = self.settings.get("name_default_container_image", None)
-    if docker_image.value is None:
-      logging.error("Docker image is Null")
-      raise ValueError("Docker Image not set")
+    if not docker_image.value:
+      default_docker_image = self.settings.get("name_default_container_image", None)
+      if default_docker_image.value is None:
+        logging.error("Docker image is Null")
+        raise ValueError("Docker Image not set")
+      docker_image.value = default_docker_image.value
 
     # Initialization of the Execution
     if self.id is not None:
