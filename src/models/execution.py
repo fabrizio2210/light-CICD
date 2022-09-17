@@ -122,9 +122,10 @@ class ExecutionModel():
     d_envs.append("--pull")
     d_envs.append("always")
 
-    for capability in docker_capabilities.value.split(","):
-      d_envs.append("--cap-add")
-      d_envs.append(quote(capability))
+    if docker_capabilities.value:
+      for capability in docker_capabilities.value.split(","):
+        d_envs.append("--cap-add")
+        d_envs.append(quote(capability))
 
     # Creation of the directory structure
     Path(exec_dir).mkdir(parents=True, exist_ok=True)
