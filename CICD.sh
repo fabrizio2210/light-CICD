@@ -38,10 +38,6 @@ fi
 #######
 # Build
 
-rm -rf "$( dirname $0 )/public/"
-mkdir "$( dirname $0 )/public/"
-hugo -D --verbose --verboseLog --baseURL http://ervisa.no-ip.dynu.net/
-
 docker build -t fabrizio2210/light_cicd-frontend:${arch} -f docker/${arch}/Dockerfile-frontend .
 docker build -t fabrizio2210/light_cicd-backend:${arch} -f docker/${arch}/Dockerfile-backend .
 docker push fabrizio2210/light_cicd-frontend:${arch}
