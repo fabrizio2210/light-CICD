@@ -5,8 +5,10 @@
 
 if [ $(uname -m) = "x86_64" ] ; then
   arch="x86_64"
+  dockerArch="x86_64"
 else
   arch="armv7hf"
+  dockerArch="armhf"
 fi
 
 ################
@@ -38,8 +40,8 @@ fi
 #######
 # Build
 
-docker build -t fabrizio2210/light_cicd-frontend:${arch} -f docker/${arch}/Dockerfile-frontend .
-docker build -t fabrizio2210/light_cicd-backend:${arch} -f docker/${arch}/Dockerfile-backend .
+docker build -t fabrizio2210/light_cicd-frontend:${arch} -f docker/x86_64/Dockerfile-frontend .
+docker build -t fabrizio2210/light_cicd-backend:${arch} -f docker/x86_64/Dockerfile-backend --build-arg DOCKERARCH=${dockerArch} .
 docker push fabrizio2210/light_cicd-frontend:${arch}
 docker push fabrizio2210/light_cicd-backend:${arch}
 
