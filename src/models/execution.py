@@ -4,6 +4,7 @@ import logging
 import random
 import signal
 import json
+import psutil
 import shutil
 from pathlib import Path, PurePath
 from datetime import datetime
@@ -82,6 +83,7 @@ class ExecutionModel():
     image_use_docker = self.settings.get("image_use_docker")
     docker_image = self.settings.get("name_container_image")
     docker_capabilities = self.settings.get("docker_capabilities")
+    parallel_execs_per_project_host = self.settings.get("parallel_execs_per_project_host", None)
 
     if not docker_image.value:
       default_docker_image = self.settings.get("name_default_container_image", None)
@@ -89,6 +91,13 @@ class ExecutionModel():
         logging.error("Docker image is Null")
         raise ValueError("Docker Image not set")
       docker_image.value = default_docker_image.value
+
+    # Throthling execution
+    if parallel_execs_per_project_host.value is not None:
+      count = ExecutionModel.getRunningExecutionByProject(self.project_id)
+      if count > parallel_execs_per_project_host.value - 1:
+        logging.warning("Too many executions (%d), limiting" % count)
+        raise RuntimeError("Too many executions (%d), limiting" % count)
 
     # Initialization of the Execution
     if self.id is not None:
@@ -273,5 +282,20 @@ class ExecutionModel():
   def getUniqueID(cls, project_id):
     #TODO do a more robust approach
     return int("{}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
+
+  @classmethod
+  def getRunningExecutionByProject(cls, project_id):
+    count = 0
+    for proc in psutil.process_iter():
+      try:
+        if "docker" in proc.cmdline():
+          if "run" in proc.cmdline():
+            for arg in proc.cmdline():
+              if f"/{project_id}/" in arg:
+                count += 1
+                break
+      except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+        pass
+    return count
 
 
