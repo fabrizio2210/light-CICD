@@ -206,7 +206,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
       {"name": "scm_url", 
-      "id": 5, 
+      "id": 7, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None }})
@@ -258,7 +258,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
       {"name": "scm_url", 
-      "id": 5, 
+      "id": 7, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None }})
@@ -278,7 +278,7 @@ class TestAPI_ProjectAsUser(unittest.TestCase):
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     try: self.assertEqual(json.loads(rv.data.decode("utf-8")), { "setting":
       {"name": "scm_url", 
-      "id": 5, 
+      "id": 7, 
       "description": "Source Control Manager URL of the project",
       "value": value,
       "default_value": None }})
