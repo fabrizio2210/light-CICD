@@ -159,6 +159,8 @@ class ExecutionModel():
                   self.settings[s].json() for s in self.settings }, f, indent = 6)
     with open(exec_dir + "/commandline", "w") as f:
       f.write(str(self.commandline))
+    with open(exec_dir + "/hostname", "w") as f:
+      f.write(str(os.getenv("HOSTNAME")))
 
     # Execution
     logging.info("Command executed: {}".format(repr(self.commandline)))
