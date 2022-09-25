@@ -1,5 +1,5 @@
 #!/bin/bash
 
 # Supposing to deploy on x86_64 architecture
-docker build -t fabrizio2210/ligth_cicd-backend-dev -f docker/x86_64/Dockerfile-backend-dev .
+docker build -t fabrizio2210/light_cicd-backend-dev -f docker/x86_64/Dockerfile-backend-dev .
 docker-compose -f docker/lib/stack-test.yml run flask
