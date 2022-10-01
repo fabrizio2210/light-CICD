@@ -9,19 +9,20 @@ export const executionoutputService = {
 };
 
 function get(project_id, execution_id, f_byte, l_byte) {
-  var url = new URL(`/api/v1/project/${project_id}/execution/${execution_id}/output`, config.apiUrl);
-  const params = { 
-      first_requested_byte: f_byte,
-      last_requested_byte: l_byte
+  var url = new URL(
+    `/api/v1/project/${project_id}/execution/${execution_id}/output`,
+    config.apiUrl
+  );
+  const params = {
+    first_requested_byte: f_byte,
+    last_requested_byte: l_byte
   };
   const requestOptions = {
     method: "GET",
-    headers: authHeader(),
+    headers: authHeader()
   };
   url.search = new URLSearchParams(params).toString();
-  return fetch(url, requestOptions).then(
-    handleResponse
-  );
+  return fetch(url, requestOptions).then(handleResponse);
 }
 
 function handleResponse(response) {

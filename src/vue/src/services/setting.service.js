@@ -24,12 +24,13 @@ function update(settingname, settingvalue) {
   const requestOptions = {
     method: "PUT",
     headers: authHeader(),
-    body: JSON.stringify({ 'value': settingvalue })
+    body: JSON.stringify({ value: settingvalue })
   };
 
-  return fetch(`${config.apiUrl}/api/v1/setting/${settingname}`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/setting/${settingname}`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function handleResponse(response) {

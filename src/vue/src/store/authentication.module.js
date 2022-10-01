@@ -12,7 +12,7 @@ export const authentication = {
   state: initialState,
   actions: {
     login({ dispatch, commit }, { username, password }) {
-      commit("loginRequest", username );
+      commit("loginRequest", username);
 
       userService.login(username, password).then(
         user => {
@@ -26,11 +26,9 @@ export const authentication = {
       );
     },
     token_refresh({ commit }, refresh_token) {
-      userService.refresh(refresh_token).then(
-        access_token => {
-          commit("refresh", access_token['access_token']);
-        }
-      );
+      userService.refresh(refresh_token).then(access_token => {
+        commit("refresh", access_token["access_token"]);
+      });
     },
     logout({ commit }) {
       userService.logout();
@@ -53,7 +51,7 @@ export const authentication = {
       state.user = null;
     },
     refresh(state, access_token) {
-      Vue.set(state.user, 'access_token', access_token);
+      Vue.set(state.user, "access_token", access_token);
     },
     logout(state) {
       state.status = {};

@@ -37,7 +37,7 @@ function refresh(refresh_token) {
   const requestOptions = {
     method: "POST",
     headers: new Headers({
-      'Authorization': `JWT ${refresh_token}`
+      Authorization: `JWT ${refresh_token}`
     })
   };
 
@@ -48,7 +48,7 @@ function refresh(refresh_token) {
       if (access_token) {
         var user = JSON.parse(localStorage.getItem("user"));
         // store user details and jwt token in local storage to keep user logged in between page refreshes
-        user.access_token = access_token['access_token'];
+        user.access_token = access_token["access_token"];
         localStorage.setItem("user", JSON.stringify(user));
       }
       return access_token;

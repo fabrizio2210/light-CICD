@@ -16,36 +16,40 @@ function getAll(project_id) {
     headers: authHeader()
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/environments`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/environments`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function update(envid, envname, envvalue, envdescription) {
   const requestOptions = {
     method: "PUT",
     headers: authHeader(),
-    body: JSON.stringify({ 
-      'value': envvalue,
-      'name': envname,
-      'description': envdescription })
+    body: JSON.stringify({
+      value: envvalue,
+      name: envname,
+      description: envdescription
+    })
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/environment/${envid}`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/environment/${envid}`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function create(project_id, newenvname) {
   const requestOptions = {
     method: "POST",
     headers: authHeader(),
-    body: JSON.stringify({ 'name': newenvname })
+    body: JSON.stringify({ name: newenvname })
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/new_environment`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/new_environment`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function handleResponse(response) {

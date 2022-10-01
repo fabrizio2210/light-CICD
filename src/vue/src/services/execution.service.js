@@ -17,9 +17,10 @@ function getAll(project_id) {
     headers: authHeader()
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/executions`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/executions`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function exec(project_id) {
@@ -28,9 +29,10 @@ function exec(project_id) {
     headers: authHeader()
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/new_execution`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/new_execution`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function get(project_id, execution_id) {
@@ -39,9 +41,10 @@ function get(project_id, execution_id) {
     headers: authHeader()
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/execution/${execution_id}`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/execution/${execution_id}`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function del(project_id, execution_id) {
@@ -50,9 +53,10 @@ function del(project_id, execution_id) {
     headers: authHeader()
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/execution/${execution_id}`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/execution/${execution_id}`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function handleResponse(response) {

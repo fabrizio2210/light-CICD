@@ -1,7 +1,11 @@
 <template>
   <div class="login">
     <h1>This is a login page</h1>
-    <Login v-on:setIdentity="jwtData.identity = $event" v-on:setRefreshToken="refresh_token = $event" v-on:setAccessToken="access_token = $event" />
+    <Login
+      v-on:setIdentity="jwtData.identity = $event"
+      v-on:setRefreshToken="refresh_token = $event"
+      v-on:setAccessToken="access_token = $event"
+    />
   </div>
 </template>
 

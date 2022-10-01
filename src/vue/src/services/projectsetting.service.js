@@ -15,21 +15,23 @@ function getAll(project_id) {
     headers: authHeader()
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/settings`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/settings`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function update(project_id, settingname, settingvalue) {
   const requestOptions = {
     method: "PUT",
     headers: authHeader(),
-    body: JSON.stringify({ 'value': settingvalue })
+    body: JSON.stringify({ value: settingvalue })
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}/setting/${settingname}`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}/setting/${settingname}`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function handleResponse(response) {

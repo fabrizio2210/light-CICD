@@ -19,27 +19,27 @@ const routes = [
     component: HomePage
   },
   {
-    path: '/projects/:project_id',
+    path: "/projects/:project_id",
     component: Project,
     children: [
       {
-        path: '',
+        path: "",
         name: "Executions",
-        component: ProjectExecutions,
+        component: ProjectExecutions
       },
       {
-        path: 'executions/:exec_id/output',
-        name: 'ExecutionOutput',
+        path: "executions/:exec_id/output",
+        name: "ExecutionOutput",
         component: ExecutionOutput
       },
       {
-        path: 'environments',
+        path: "environments",
         name: "ProjectEnvironments",
         component: ProjectEnvironments
       },
       {
-        path: 'settings',
-        name: 'ProjectSettings',
+        path: "settings",
+        name: "ProjectSettings",
         component: ProjectSettings
       }
     ]

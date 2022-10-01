@@ -27,16 +27,17 @@ function get(project_id) {
     headers: authHeader()
   };
 
-  return fetch(`${config.apiUrl}/api/v1/project/${project_id}`, requestOptions).then(
-    handleResponse
-  );
+  return fetch(
+    `${config.apiUrl}/api/v1/project/${project_id}`,
+    requestOptions
+  ).then(handleResponse);
 }
 
 function create(projectname) {
   const requestOptions = {
     method: "POST",
     headers: authHeader(),
-    body: JSON.stringify({ name: projectname})
+    body: JSON.stringify({ name: projectname })
   };
 
   return fetch(`${config.apiUrl}/api/v1/new_project`, requestOptions).then(

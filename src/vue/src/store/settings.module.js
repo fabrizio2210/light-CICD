@@ -4,21 +4,21 @@ export const settings = {
   namespaced: true,
   state: {
     all: {},
-    status : {}
+    status: {}
   },
   actions: {
     updating({ dispatch, commit }, { settingname, settingvalue }) {
-      commit("updatingRequest", { });
-        settingService.update(settingname, settingvalue).then(
-          setting => {
-            commit("updatingSuccess", setting);
-          },
-          error => {
-            commit("updatingFailure", error);
-            dispatch("alert/error", error, { root: true});
-          }
-        );
-      },
+      commit("updatingRequest", {});
+      settingService.update(settingname, settingvalue).then(
+        setting => {
+          commit("updatingSuccess", setting);
+        },
+        error => {
+          commit("updatingFailure", error);
+          dispatch("alert/error", error, { root: true });
+        }
+      );
+    },
     getAll({ commit }) {
       commit("getAllRequest");
 
@@ -45,9 +45,9 @@ export const settings = {
       state.all = { loading: true };
     },
     getAllSuccess(state, settings) {
-      const settings_dict = {}
-      settings.forEach((element) => element.untouched = true);
-      settings.forEach((element) => settings_dict[element.name] = element);
+      const settings_dict = {};
+      settings.forEach(element => (element.untouched = true));
+      settings.forEach(element => (settings_dict[element.name] = element));
       state.all = { settings_dict };
     },
     getAllFailure(state, error) {
