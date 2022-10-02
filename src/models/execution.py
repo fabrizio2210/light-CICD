@@ -45,7 +45,7 @@ class ExecutionModel():
   project_dir_format = "{root_dir}/{prj}"
   project_repo_dir_format = "{root_dir}/{prj}/repo"
   central_repo_dir_format = "{root_dir}/repo"
-  exec_dir_format    = "{root_dir}/{prj}/{exc}"
+  exec_dir_format    = "{root_dir}/{prj}/{exc:0>20}"
 
   def __init__(self, project_id, id = None, commandline = None, start_time = None, rc = None, stop_time = None, settings = None):
     if settings is None:
