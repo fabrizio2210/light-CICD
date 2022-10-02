@@ -16,6 +16,7 @@ from resources.main_setting import MainSettingList, MainSetting
 from resources.environment import EnvironmentList, Environment, NewEnvironment
 from resources.execution import Execution, NewExecution, ExecutionList, ExecutionOutput
 from resources.github import GithubReceiver
+from resources.generic_external import GenericExternal
 from utils.networking import get_my_ip
 from utils.data import bootstrap
 
@@ -27,6 +28,7 @@ if __name__ == '__main__' or os.getenv('DEBUG', 0) == '1':
 db.set_db_filename(os.getenv('DB_PATH', '/tmp/data.db'))
 ExecutionModel.set_projects_dir(os.getenv('PROJECTS_PATH', '/tmp/projects'))
 GithubReceiver.set_webhook_secret(os.getenv('WEBHOOK_SECRET', ''))
+GenericExternal.set_webhook_secret(os.getenv('GENERIC_WEBHOOK_SECRET', ''))
 
 
 app = Flask(__name__)
@@ -66,6 +68,7 @@ api.add_resource(ExecutionOutput, '/api/v1/project/<int:project_id>/execution/<i
 api.add_resource(NewExecution, '/api/v1/project/<int:project_id>/new_execution')
 
 api.add_resource(GithubReceiver, '/api/v1/external/github_trigger')
+api.add_resource(GenericExternal, '/api/v1/external/generic_trigger')
 
 if __name__ == '__main__':
   logging.info('Started')

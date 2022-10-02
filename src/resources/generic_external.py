@@ -10,14 +10,12 @@ from models.project_setting_map import ProjectSettingMap
 from models.setting import SettingModel
 
 
-class GithubReceiver(Resource):
+class GenericExternal(Resource):
   parser = reqparse.RequestParser()
   parser.add_argument('repository',
-                      type=dict,
+                      type=str,
                       required=True)
-  parser.add_argument('X-Hub-Signature-256',
-                      location='headers')
-  parser.add_argument('X-GitHub-Event',
+  parser.add_argument('Signature-256',
                       location='headers',
                       required=True)
   hmac = None
@@ -29,24 +27,20 @@ class GithubReceiver(Resource):
 
 
   def post(self):
-    data = GithubReceiver.parser.parse_args()
-    event = data['X-GitHub-Event']
+    data = GenericExternal.parser.parse_args()
     repository = data['repository']
-    logging.info('Github webhook for: %s', repository['clone_url'])
+    logging.info('Generic External webhook for: %s', repository)
 
-    hmac_obj = GithubReceiver.hmac.copy()
+    hmac_obj = GenericExternal.hmac.copy()
     hmac_obj.update(request.get_data())
-    if not hmac.compare_digest(data['X-Hub-Signature-256'], 'sha256=' + hmac_obj.hexdigest()):
-      logging.info('Received X-Hub-Signature-256: %s', data['X-Hub-Signature-256'])
-      logging.info('Expected X-Hub-Signature-256: %s', hmac_obj.hexdigest())
-      return {'message': 'The X-Hub-Signature-256 is not correct'}, 401
-    
-    if not 'push' == event:
-      return {'message': 'Not handling events different than "push"'}, 400
+    if not hmac.compare_digest(data['Signature-256'], 'sha256=' + hmac_obj.hexdigest()):
+      logging.info('Received Signature-256: %s', data['Signature-256'])
+      logging.info('Expected Signature-256: %s', hmac_obj.hexdigest())
+      return {'message': 'The Signature-256 is not correct'}, 401
 
     settings = SettingModel.find_by_name('scm_url')
     for setting in settings:
-      if setting.value == repository['clone_url']:
+      if setting.value == repository:
         project_ids = ProjectSettingMap.find_project_id_by_setting_id(setting.id)
         if not project_ids:
           return {'message': 'Setting is not associate to any project'}, 500
