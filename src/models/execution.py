@@ -59,7 +59,7 @@ class ExecutionModel():
     self.commandline = commandline
 
   def json(self):
-    return { 'id': str(self.id), 
+    return { 'id': self.id, 
             'project_id': self.project_id, 
             'settings': list(map(lambda x: self.settings[x].json(), self.settings)), 
             'commandline': self.commandline, 
@@ -287,7 +287,7 @@ class ExecutionModel():
   @classmethod
   def getUniqueID(cls, project_id):
     #TODO do a more robust approach
-    return str("{}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
+    return int("{}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
 
   @classmethod
   def getRunningExecutionByProject(cls, project_id):
