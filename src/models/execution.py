@@ -104,6 +104,7 @@ class ExecutionModel():
       logging.error("The ID is already populated")
       raise ValueError("Not possible to rexecute the same execution")
     self.id = ExecutionModel.getUniqueID(self.project_id)
+    logging.info(self.id)
     self.start_time = int(datetime.now().timestamp())
     exec_dir = self.exec_dir_format.format(root_dir=ExecutionModel.projects_dir,
                   prj=self.project_id,
@@ -281,7 +282,7 @@ class ExecutionModel():
   @classmethod
   def getUniqueID(cls, project_id):
     #TODO do a more robust approach
-    return int("{}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
+    return str("{:0>14}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
 
   @classmethod
   def getRunningExecutionByProject(cls, project_id):
