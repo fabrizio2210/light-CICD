@@ -197,6 +197,7 @@ class ExecutionModel():
             exec_id = int(PurePath(item).name)
           except:
             # The directory is not a number, so it cannot be an execution id.
+            logging.info("'%s' is not a directory which contains an execution." % PurePath(item).name)
             continue
           potential_executions = cls.find_by_id_and_project_id(exec_id, project_id)
           if potential_executions:
