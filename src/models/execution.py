@@ -45,7 +45,7 @@ class ExecutionModel():
   project_dir_format = "{root_dir}/{prj}"
   project_repo_dir_format = "{root_dir}/{prj}/repo"
   central_repo_dir_format = "{root_dir}/repo"
-  exec_dir_format    = "{root_dir}/{prj}/{exc:0>20}"
+  exec_dir_format    = "{root_dir}/{prj}/{exc}"
 
   def __init__(self, project_id, id = None, commandline = None, start_time = None, rc = None, stop_time = None, settings = None):
     if settings is None:
@@ -59,7 +59,7 @@ class ExecutionModel():
     self.commandline = commandline
 
   def json(self):
-    return { 'id': self.id, 
+    return { 'id': str(self.id), 
             'project_id': self.project_id, 
             'settings': list(map(lambda x: self.settings[x].json(), self.settings)), 
             'commandline': self.commandline, 
@@ -101,7 +101,7 @@ class ExecutionModel():
 
     # Initialization of the Execution
     if self.id is not None:
-      logging.error("The ID is already populated")
+      logging.error("The ID is already populated: %s" % self.id)
       raise ValueError("Not possible to rexecute the same execution")
     self.id = ExecutionModel.getUniqueID(self.project_id)
     logging.info(self.id)
@@ -193,7 +193,12 @@ class ExecutionModel():
     if project_dir.is_dir():
       for item in project_dir.iterdir():
         if item.is_dir():
-          potential_executions = cls.find_by_id_and_project_id(PurePath(item).name, project_id)
+          try:
+            exec_id = int(PurePath(item).name)
+          except:
+            # The directory is not a number, so it cannot be an execution id.
+            continue
+          potential_executions = cls.find_by_id_and_project_id(exec_id, project_id)
           if potential_executions:
             executions.append(potential_executions[0])
       
@@ -282,7 +287,7 @@ class ExecutionModel():
   @classmethod
   def getUniqueID(cls, project_id):
     #TODO do a more robust approach
-    return str("{:0>14}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
+    return str("{}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
 
   @classmethod
   def getRunningExecutionByProject(cls, project_id):
