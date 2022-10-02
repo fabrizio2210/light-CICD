@@ -80,14 +80,14 @@ class NewProject(Resource):
       project.save_to_db()
     except Exception as e:
       print(e)
-      return {"message": "An error occurred inserting the item."}, 500
+      return {"message": "An error occurred inserting the item: %s" % repr(e)}, 500
 
     # Map the project to the user
     mapping_user = UserProjectMap(user_id = user_id, project_id = project.id)
     try:
       mapping_user.save_to_db()
-    except:
+    except Exception as e:
       project.delete_from_db()
-      return {"message": "An error occurred mapping the user to the project."}, 500
+      return {"message": "An error occurred mapping the user to the project: %s" % repr(e)}, 500
 
     return project.json(), 201

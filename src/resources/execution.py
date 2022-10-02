@@ -76,6 +76,6 @@ class NewExecution(Resource):
       execution.exec()
     except Exception as e:
       logging.error(repr(e))
-      return {"message": "An error occurred running the item."}, 500
+      return {"message": "Error doing the execution: %s." % repr(e)}, 500
 
     return { 'execution': execution.json()}, 201

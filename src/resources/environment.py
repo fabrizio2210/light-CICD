@@ -139,14 +139,14 @@ class NewEnvironment(Resource):
       env.save_to_db()
     except Exception as e:
       logging.error(e)
-      return {"message": "An error occurred inserting the env."}, 500
+      return {"message": "An error occurred inserting the env: %s" % repr(e)}, 500
 
     # Map the env to the project
     mapping_project = ProjectEnvironmentMap(name = data['name'], project_id = projects[0].id, environment_id = env.id)
     try:
       mapping_project.save_to_db()
-    except:
+    except Exception as e:
       logging.error(sys.exc_info())
       env.delete_from_db()
-      return {"message": "An error occurred mapping the environment to the project."}, 500
+      return {"message": "An error occurred mapping the environment to the project: %s" % repr(e)}, 500
     return {'environment': env.json()}, 201

@@ -54,17 +54,17 @@ class ProjectSetting(Resource):
     setting.value = data['value']
     try:
       setting.save_to_db()
-    except:
-      return {'message': "An error occurred creating the setting"}, 500
+    except Exception as e:
+      return {'message': "An error occurred creating the setting: %s" % repr(e)}, 500
 
     # Associate setting to the project, if new
     if is_new_setting:
       mapping_setting = ProjectSettingMap(project_id=project_id, setting_id=setting.id, name=setting.name)
       try:
         mapping_setting.save()
-      except:
+      except Exception as e:
         setting.delete_from_db()
-        return {'message': "An error occurred mapping the setting to the project"}, 500
+        return {'message': "An error occurred mapping the setting to the project: %s" % repr(e)}, 500
 
     return {'setting': setting.json()}
 
