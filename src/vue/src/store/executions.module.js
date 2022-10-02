@@ -13,6 +13,7 @@ export const executions = {
       executionService.exec(project_id).then(
         execution => {
           commit("executingSuccess", execution["execution"]);
+          dispatch("alert/success", "", { root: true });
         },
         error => {
           commit("executingFailure", error);
@@ -24,13 +25,17 @@ export const executions = {
       commit("getAllRequest", project_id);
 
       executionService.getAll(project_id).then(
-        executions => commit("getAllSuccess", { executions, project_id }),
+        executions => {
+          commit("getAllSuccess", { executions, project_id });
+        },
         error => commit("getAllFailure", error)
       );
     },
-    get({ commit }, { project_id, execution_id}) {
+    get({ commit }, { project_id, execution_id }) {
       executionService.get(project_id, execution_id).then(
-        execution => commit("getSuccess", { execution, project_id }),
+        execution => { 
+          commit("getSuccess", { execution, project_id });
+        },
         error => commit("getFailure", error)
       );
     }
@@ -103,6 +108,6 @@ export const executions = {
     },
     getFailure(state, error) {
       state.all = { error };
-    },
+    }
   }
 };

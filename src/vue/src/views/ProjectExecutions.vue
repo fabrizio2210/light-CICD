@@ -47,10 +47,10 @@ export default {
     return {};
   },
   computed: {
-    avg_size () {
+    avg_size() {
       if (this.ordered_executions && this.execution_outputs) {
-        let sum_size = 0
-        let execs_num = 0
+        let sum_size = 0;
+        let execs_num = 0;
         for (const exec of this.ordered_executions) {
           if (exec.stop_time) {
             if (this.execution_outputs[exec.id]) {
@@ -59,9 +59,9 @@ export default {
             }
           }
         }
-        return sum_size/execs_num;
+        return sum_size / execs_num;
       }
-      return 1
+      return 1;
     },
     executing() {
       return this.$store.state.executions.status.executing;
@@ -71,11 +71,19 @@ export default {
     },
     executions() {
       const project_id = this.$route.params.project_id;
-      return this.$store.state.executions.all.executions_dicts[project_id];
+      if (this.$store.state.executions.all.executions_dicts[project_id]) {
+        return this.$store.state.executions.all.executions_dicts[project_id];
+      } else {
+        return {};
+      }
     },
     execution_outputs() {
       const project_id = this.$route.params.project_id;
-      return this.$store.state.executionoutputs.all.output_dicts[project_id];
+      if (this.$store.state.executionoutputs.all.output_dicts[project_id]) {
+        return this.$store.state.executionoutputs.all.output_dicts[project_id];
+      } else {
+        return {};
+      }
     },
     ordered_executions() {
       function compare(a, b) {
@@ -107,10 +115,21 @@ export default {
     },
     elapsedTimeString(execution) {
       if (!execution.stop_time) {
-        if (this.execution_outputs && this.execution_outputs[execution.id] && this.avg_size != 1) {
-          return (this.execution_outputs[execution.id].output.file_bytes*100/this.avg_size).toFixed().toString() + "%"
+        if (
+          this.execution_outputs &&
+          this.execution_outputs[execution.id] &&
+          this.avg_size != 1
+        ) {
+          return (
+            (
+              (this.execution_outputs[execution.id].output.file_bytes * 100) /
+              this.avg_size
+            )
+              .toFixed()
+              .toString() + "%"
+          );
         }
-        return "Not finished yet"
+        return "Not finished yet";
       }
       var sec_num = parseInt(execution.stop_time - execution.start_time, 10);
       var hours = Math.floor(sec_num / 3600);
@@ -128,7 +147,7 @@ export default {
       }
       return hours + ":" + minutes + ":" + seconds;
     },
-    async fillOutputSize(){
+    async fillOutputSize() {
       this.ordered_executions.forEach(exe => {
         const project_id = exe.project_id;
         const execution_id = exe.id;
