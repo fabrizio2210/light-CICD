@@ -34,12 +34,31 @@ export const executionoutputs = {
         Vue.set(state.all.output_dicts, p.project_id, {});
       !(p.execution_id in state.all.output_dicts[p.project_id]) &&
         Vue.set(state.all.output_dicts[p.project_id], p.execution_id, {});
-      //TODO implement better use of f_byte and l_byte
-      Vue.set(
-        state.all.output_dicts[p.project_id][p.execution_id],
-        "output",
-        p.output["output"]
-      );
+      if (Object.keys(state.all.output_dicts[p.project_id][p.execution_id]).length != 0){
+        Vue.set(
+          state.all.output_dicts[p.project_id][p.execution_id]["output"],
+          "file_bytes",
+          p.output["output"]["file_bytes"]
+        );
+        if (p.output["output"]["last_transmitted_byte"] > state.all.output_dicts[p.project_id][p.execution_id]["output"]["last_transmitted_byte"]) {
+          Vue.set(
+            state.all.output_dicts[p.project_id][p.execution_id]["output"],
+            "data",
+            p.output["output"]["data"]
+          );
+          Vue.set(
+            state.all.output_dicts[p.project_id][p.execution_id]["output"],
+            "first_transmitted_byte",
+            p.output["output"]["first_transmitted_byte"]
+          );
+        }
+      } else {
+        Vue.set(
+          state.all.output_dicts[p.project_id][p.execution_id],
+          "output",
+          p.output["output"]
+        );
+      }
       state.status = {};
     },
     fetchingFailure(state) {

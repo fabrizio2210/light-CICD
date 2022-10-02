@@ -47,6 +47,22 @@ export default {
     return {};
   },
   computed: {
+    avg_size () {
+      if (this.ordered_executions && this.execution_outputs) {
+        let sum_size = 0
+        let execs_num = 0
+        for (const exec of this.ordered_executions) {
+          if (exec.stop_time) {
+            if (this.execution_outputs[exec.id]) {
+              sum_size += this.execution_outputs[exec.id].output.file_bytes;
+              execs_num += 1;
+            }
+          }
+        }
+        return sum_size/execs_num;
+      }
+      return 1
+    },
     executing() {
       return this.$store.state.executions.status.executing;
     },
@@ -56,6 +72,10 @@ export default {
     executions() {
       const project_id = this.$route.params.project_id;
       return this.$store.state.executions.all.executions_dicts[project_id];
+    },
+    execution_outputs() {
+      const project_id = this.$route.params.project_id;
+      return this.$store.state.executionoutputs.all.output_dicts[project_id];
     },
     ordered_executions() {
       function compare(a, b) {
@@ -67,7 +87,11 @@ export default {
         }
         return 0;
       }
-      return Object.values(this.executions.executions).sort(compare);
+      if (this.executions.executions) {
+        return Object.values(this.executions.executions).sort(compare);
+      } else {
+        return Array();
+      }
     }
   },
   methods: {
@@ -83,7 +107,10 @@ export default {
     },
     elapsedTimeString(execution) {
       if (!execution.stop_time) {
-        return "Not finished yet";
+        if (this.execution_outputs && this.execution_outputs[execution.id] && this.avg_size != 1) {
+          return (this.execution_outputs[execution.id].output.file_bytes*100/this.avg_size).toFixed().toString() + "%"
+        }
+        return "Not finished yet"
       }
       var sec_num = parseInt(execution.stop_time - execution.start_time, 10);
       var hours = Math.floor(sec_num / 3600);
@@ -100,11 +127,29 @@ export default {
         seconds = "0" + seconds;
       }
       return hours + ":" + minutes + ":" + seconds;
+    },
+    async fillOutputSize(){
+      this.ordered_executions.forEach(exe => {
+        const project_id = exe.project_id;
+        const execution_id = exe.id;
+        this.$store.dispatch("executions/get", { project_id, execution_id });
+        const f_byte = 0;
+        const l_byte = 0;
+        this.$store.dispatch("executionoutputs/fetching", {
+          project_id,
+          execution_id,
+          f_byte,
+          l_byte
+        });
+      });
     }
   },
   created() {
     const project_id = this.$route.params.project_id;
     this.$store.dispatch("executions/getAll", { project_id });
+  },
+  mounted() {
+    setInterval(this.fillOutputSize, 5000);
   }
 };
 </script>

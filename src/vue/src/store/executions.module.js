@@ -27,6 +27,12 @@ export const executions = {
         executions => commit("getAllSuccess", { executions, project_id }),
         error => commit("getAllFailure", error)
       );
+    },
+    get({ commit }, { project_id, execution_id}) {
+      executionService.get(project_id, execution_id).then(
+        execution => commit("getSuccess", { execution, project_id }),
+        error => commit("getFailure", error)
+      );
     }
   },
   mutations: {
@@ -77,6 +83,26 @@ export const executions = {
     },
     getAllFailure(state, error) {
       state.all = { error };
-    }
+    },
+    getSuccess(state, p) {
+      var execution = p.execution["execution"];
+      !(execution.project_id in state.all.executions_dicts) &&
+        Vue.set(state.all.executions_dicts, execution.project_id, {});
+      !("executions" in state.all.executions_dicts[execution.project_id]) &&
+        Vue.set(
+          state.all.executions_dicts[execution.project_id],
+          "executions",
+          {}
+        );
+      Vue.set(
+        state.all.executions_dicts[execution.project_id]["executions"],
+        execution.id,
+        execution
+      );
+      Vue.delete(state.all.executions_dicts[p.project_id], "loading");
+    },
+    getFailure(state, error) {
+      state.all = { error };
+    },
   }
 };
