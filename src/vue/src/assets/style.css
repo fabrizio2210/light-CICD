@@ -72,13 +72,10 @@ body {
 /*END RESETS*/
 
 .login-form {
-  text-align: right;
-  width: 500px;
 }
 
 .form-input {
-  text-align: right;
-  display: inline-block;
+  display: block;
 }
 
 .form-input > label {
