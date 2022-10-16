@@ -127,10 +127,10 @@ class ExecutionModel():
     if image_use_docker.value:
       d_envs.append("-v")
       d_envs.append("/var/run/docker.sock:/var/run/docker.sock")
-      d_envs.append("-v")
-      d_envs.append(quote("{}:{}".format(project_repo_dir,project_repo_dir)))
-      d_envs.append("-v")
-      d_envs.append(quote("{}:{}".format(central_repo_dir,central_repo_dir)))
+    d_envs.append("-v")
+    d_envs.append(quote("{}:{}".format(project_repo_dir,project_repo_dir)))
+    d_envs.append("-v")
+    d_envs.append(quote("{}:{}".format(central_repo_dir,central_repo_dir)))
 
     d_envs.append("--pull")
     d_envs.append("always")
