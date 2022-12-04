@@ -508,7 +508,7 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
     try: self.assertTrue(response['execution']['stop_time'] is None)
     except AssertionError as e: self.verificationErrors.append(str(e) + "Line: " + str(sys.exc_info()[2].tb_lineno)) 
     # Get a execution output of the new project
-    time.sleep(1)
+    time.sleep(2)
     first_byte = 0
     last_byte = 200
     payload = "first_requested_byte=" + str(first_byte) + "&last_requested_byte=" + str(last_byte)
