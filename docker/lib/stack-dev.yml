@@ -70,9 +70,12 @@ services:
     environment:
       DEBUG: 1
       WEBHOOK_SECRET: dfc448942b9d1496ceeaf7f3e8ba50a6cbab126f
+      PROJECTS_PATH: "/opt/data/projects"
+      PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
     volumes:
       - ../../src:/opt/web
       - /var/run/docker.sock:/var/run/docker.sock
+      - temp_projects_dir:/opt/data
     networks: 
       - backends
 
@@ -80,3 +83,7 @@ networks:
   backends:
     driver: overlay
     attachable: true
+
+volumes:
+  temp_projects_dir:
+    external: true

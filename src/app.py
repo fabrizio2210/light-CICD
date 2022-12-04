@@ -27,6 +27,7 @@ if __name__ == '__main__' or os.getenv('DEBUG', 0) == '1':
 # Initialise from envrironment variables
 db.set_db_filename(os.getenv('DB_PATH', '/tmp/data.db'))
 ExecutionModel.set_projects_dir(os.getenv('PROJECTS_PATH', '/tmp/projects'))
+ExecutionModel.set_projects_volume_string(os.getenv('PROJECTS_VOLUME_STRING', None))
 GithubReceiver.set_webhook_secret(os.getenv('WEBHOOK_SECRET', ''))
 GenericExternal.set_webhook_secret(os.getenv('GENERIC_WEBHOOK_SECRET', ''))
 

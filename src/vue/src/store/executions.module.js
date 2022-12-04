@@ -33,7 +33,7 @@ export const executions = {
     },
     get({ commit }, { project_id, execution_id }) {
       executionService.get(project_id, execution_id).then(
-        execution => { 
+        execution => {
           commit("getSuccess", { execution, project_id });
         },
         error => commit("getFailure", error)

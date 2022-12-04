@@ -42,6 +42,7 @@ class ExecutionModel():
   commandline = None
   project_id = None
   projects_dir = None
+  projects_volume_string = None
   project_dir_format = "{root_dir}/{prj}"
   project_repo_dir_format = "{root_dir}/{prj}/repo"
   central_repo_dir_format = "{root_dir}/repo"
@@ -127,10 +128,9 @@ class ExecutionModel():
     if image_use_docker.value:
       d_envs.append("-v")
       d_envs.append("/var/run/docker.sock:/var/run/docker.sock")
-    d_envs.append("-v")
-    d_envs.append(quote("{}:{}".format(project_repo_dir,project_repo_dir)))
-    d_envs.append("-v")
-    d_envs.append(quote("{}:{}".format(central_repo_dir,central_repo_dir)))
+    if ExecutionModel.projects_volume_string:
+      d_envs.append("-v")
+      d_envs.append(quote(ExecutionModel.projects_volume_string))
 
     d_envs.append("--pull")
     d_envs.append("always")
@@ -284,6 +284,10 @@ class ExecutionModel():
   @classmethod
   def set_projects_dir(cls, projects_dir):
     cls.projects_dir = projects_dir
+
+  @classmethod
+  def set_projects_volume_string(cls, projects_volume_string):
+    cls.projects_volume_string = projects_volume_string
 
   @classmethod
   def getUniqueID(cls, project_id):
