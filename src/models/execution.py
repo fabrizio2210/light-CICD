@@ -100,6 +100,9 @@ class ExecutionModel():
         logging.warning("Too many executions (%d), limiting" % count)
         raise RuntimeError("Too many executions (%d), limiting" % count)
 
+    # Cleaning old executions
+    ExecutionModel.keepLastExecutions(self.project_id)
+
     # Initialization of the Execution
     if self.id is not None:
       logging.error("The ID is already populated: %s" % self.id)
@@ -242,6 +245,7 @@ class ExecutionModel():
     exec_dir = cls.exec_dir_format.format(root_dir=cls.projects_dir,
                   prj=project_id,
                   exc=id)
+    logging.info("rm -rf %s", exec_dir)
     if Path(exec_dir).is_dir():
       try:
         shutil.rmtree(Path(exec_dir))
@@ -280,6 +284,21 @@ class ExecutionModel():
   def cleanup(cls):
     if Path(cls.projects_dir).is_dir():
       shutil.rmtree(cls.projects_dir)
+
+  @classmethod
+  def keepLastExecutions(cls, project_id):
+    executions = cls.find_executions_by_project_id(project_id)
+    executions.sort(key=lambda e: e.start_time, reverse=True)
+
+    number_of_executions_to_keep = ProjectSettingMap.get_project_setting_by_name(project_id,
+                                                                                 "number_of_executions_to_keep")
+    if number_of_executions_to_keep is None:
+      number_of_executions_to_keep = MainSettingModel.get_setting_by_name("number_of_executions_to_keep")
+
+    if number_of_executions_to_keep:
+      for e in executions[number_of_executions_to_keep[0].value-1:]:
+        logging.info("Deleting %d execution of %d.", e.id, project_id)
+        cls.delete_by_id_and_project_id(e.id, project_id)
 
   @classmethod
   def set_projects_dir(cls, projects_dir):

@@ -79,9 +79,19 @@ def bootstrap(force=False, dev=False, quiet=False):
   if not SettingModel.find_by_name("parallel_execs_per_project_host"):
     new_setting = SettingModel(id=None, 
                                name="parallel_execs_per_project_host", 
-                               description = "Number of concurrent execution per host and project.",
+                               description = "Number of concurrent executions per host and project.",
                                value = 1,
                                default_value = 1)
+    new_setting.save()
+    new_main_setting = MainSettingModel(new_setting.name, new_setting.id)
+    new_main_setting.save()
+
+  if not SettingModel.find_by_name("number_of_executions_to_keep"):
+    new_setting = SettingModel(id=None, 
+                               name="number_of_executions_to_keep", 
+                               description = "Number of stored executions per project.",
+                               value = 10,
+                               default_value = 10)
     new_setting.save()
     new_main_setting = MainSettingModel(new_setting.name, new_setting.id)
     new_main_setting.save()
