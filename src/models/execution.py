@@ -123,6 +123,9 @@ class ExecutionModel():
       envs.append(EnvironmentModel(id=None, name="MANUAL_TRIGGER", value="1"))
     envs.append(EnvironmentModel(id=None, name="PROJECT_REPOSITORY", value=project_repo_dir))
     envs.append(EnvironmentModel(id=None, name="REPOSITORY", value=central_repo_dir))
+    if ExecutionModel.projects_volume_string:
+      envs.append(EnvironmentModel(id=None, name="PROJECT_VOLUME_STRING", value=ExecutionModel.projects_volume_string))
+
     d_envs = []
     for env in envs:
       d_envs.append("--env")
