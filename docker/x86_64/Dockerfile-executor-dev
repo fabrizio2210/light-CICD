@@ -1,0 +1,7 @@
+FROM golang:1.22.2
+
+WORKDIR /usr/src/app/cmd/executor
+
+RUN go install github.com/githubnemo/CompileDaemon@latest
+
+CMD CompileDaemon -command="./executor"

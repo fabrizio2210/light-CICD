@@ -79,6 +79,20 @@ services:
     networks: 
       - backends
 
+  executor:
+    image: fabrizio2210/light_cicd-executor-dev
+    environment:
+      REDIS_HOST: redis
+    volumes:
+      - ../../src/go:/usr/src/app
+    networks:
+      - backends
+
+  redis:
+    image: redis
+    networks:
+      - backends
+
 networks:
   backends:
     driver: overlay
