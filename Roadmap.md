@@ -1,8 +1,10 @@
 # Roadmap
 
-- Insert login
-- Use sqlite as a backend DB
-- Substitute sqlite with something that can serve several distributed nodes
+- Substitute sqlite with MariaDB o MongoDB
+- Introduce Redis and workers which will run the execution
+ - workers written in Golang, Redis will have a queue and a proto between python and Go will be used
+- Introduce API for the script in the container to fan out the load
+- Use sidecar executable to upload output (stdout, stderr) to Redis
 
 # Requirements
 
@@ -24,3 +26,4 @@
 
 - The environment variables are not shared between projects
   every project has its own set of variables
+  - To change this, use a normal MariaDB 
