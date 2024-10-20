@@ -1,0 +1,19 @@
+syntax = "proto2";
+
+package executor;
+option go_package = "github.com/fabrizio2210/light-CICD/src/go/internal/proto";
+
+message EnvironmentVariable {
+    required string name = 1;
+    optional string value = 2;
+}
+
+message Execution {
+  optional string id = 1;
+  optional string project_id = 2;
+  optional string scm_url = 3;
+  optional bool image_use_docker = 4;
+  optional string docker_image = 5;
+  repeated EnvironmentVariable environment_variable = 6;
+  repeated string docker_capability = 7;
+}
