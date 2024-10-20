@@ -4,9 +4,18 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os/exec"
 
+	"github.com/fabrizio2210/light-CICD/src/go/internal/proto/executor"
 	"github.com/fabrizio2210/light-CICD/src/go/internal/rediswrapper"
 )
+
+var execCommand = exec.Command
+
+func RunDocker(execution *executor.Execution) ([]byte, error) {
+	cmd := execCommand("docker", "run", "-d", "  ")
+	return cmd.CombinedOutput()
+}
 
 func WaitForJob() {
 	ctx := context.Background()
