@@ -1,7 +1,7 @@
 syntax = "proto2";
 
 package executor;
-option go_package = "github.com/fabrizio2210/light-CICD/src/go/internal/proto";
+option go_package = "github.com/fabrizio2210/light-CICD/src/go/internal/proto/executor";
 
 message EnvironmentVariable {
     required string name = 1;
