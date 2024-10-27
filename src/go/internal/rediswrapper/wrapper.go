@@ -23,11 +23,10 @@ func Publish(ctx context.Context, topic string, json []byte) error {
 	return nil
 }
 
-func WaitFor(ctx context.Context, queue string) ([]string, error) {
+func WaitFor(ctx context.Context, queue string) (string, error) {
 	msg, err := RedisClient.BLPop(ctx, 0, queue).Result()
 	if err != nil {
-		 return nil, err
+		return "", err
 	}
-	return msg, nil
+	return msg[1], nil
 }
-

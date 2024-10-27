@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
 	"testing"
@@ -9,6 +8,10 @@ import (
 	"github.com/fabrizio2210/light-CICD/src/go/internal/proto/executor"
 	"github.com/fabrizio2210/light-CICD/src/go/internal/rediswrapper"
 	"github.com/go-redis/redismock/v8"
+	"github.com/google/go-cmp/cmp"
+	"google.golang.org/protobuf/encoding/prototext"
+	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/testing/protocmp"
 )
 
 func fakeExecCommand(command string, args ...string) *exec.Cmd {
@@ -19,18 +22,14 @@ func fakeExecCommand(command string, args ...string) *exec.Cmd {
 	return cmd
 }
 
-const dockerRunResult = "foo!"
-
 func TestRunDocker(t *testing.T) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
 	var input executor.Execution
-	out, err := RunDocker(&input)
+	runner := &Docker{}
+	err := runner.Run(&input)
 	if err != nil {
 		t.Errorf("Expected nil error, got %#v", err)
-	}
-	if string(out) != dockerRunResult {
-		t.Errorf("Expected %q, got %q", dockerRunResult, out)
 	}
 }
 
@@ -39,13 +38,44 @@ func TestHelperProcess(t *testing.T) {
 		return
 	}
 	// some code here to check arguments perhaps?
-	fmt.Fprintf(os.Stdout, dockerRunResult)
+
+	// some code to emaulate output?
+	// fmt.Fprintf(os.Stdout, dockerRunResult)
+
 	os.Exit(0)
 }
 
+type fakeDocker struct {
+	arg *executor.Execution
+}
+
+func (f *fakeDocker) Run(e *executor.Execution) error {
+	f.arg = e
+	return nil
+}
+
 func TestWaitForJob(t *testing.T) {
+	inputExecution := &executor.Execution{
+		Id:        proto.String("123"),
+		ProjectId: proto.String("222"),
+		EnvironmentVariable: []*executor.EnvironmentVariable{
+			{
+				Name:  proto.String("key"),
+				Value: proto.String("value_of_env"),
+			},
+		},
+	}
 	var redisMock redismock.ClientMock
 	rediswrapper.RedisClient, redisMock = redismock.NewClientMock()
-	redisMock.ExpectBLPop(0, "executions").SetVal([]string{"test_execution"})
-	WaitForJob()
+	text, err := prototext.Marshal(inputExecution)
+	if err != nil {
+		t.Errorf("Error during proto conversion: %v", err)
+	}
+	redisMock.ExpectBLPop(0, "executions").SetVal([]string{"executions", string(text)})
+	fakeInterface := &fakeDocker{}
+	WaitForJob(fakeInterface)
+	diff := cmp.Diff(fakeInterface.arg, inputExecution, protocmp.Transform())
+	if diff != "" {
+		t.Errorf("Argument passed to WaitForJob is different: %v", diff)
+	}
 }
