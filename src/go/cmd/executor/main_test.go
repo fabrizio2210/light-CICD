@@ -1,11 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"testing"
 
-	"github.com/fabrizio2210/light-CICD/src/go/internal/proto/executor"
+	epb "github.com/fabrizio2210/light-CICD/src/go/internal/proto/executor"
 	"github.com/fabrizio2210/light-CICD/src/go/internal/rediswrapper"
 	"github.com/go-redis/redismock/v8"
 	"github.com/google/go-cmp/cmp"
@@ -19,17 +20,39 @@ func fakeExecCommand(command string, args ...string) *exec.Cmd {
 	cs = append(cs, args...)
 	cmd := exec.Command(os.Args[0], cs...)
 	cmd.Env = []string{"GO_WANT_HELPER_PROCESS=1"}
+	cmd.Stderr = os.Stderr
+	cmd.Stdout = os.Stdout
 	return cmd
 }
 
 func TestRunDocker(t *testing.T) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
-	var input executor.Execution
+	input := &epb.Execution{
+		Id:        proto.String("123"),
+		ProjectId: proto.String("222"),
+		ScmUrl:    proto.String("https://github.com/example"),
+		EnvironmentVariable: []*epb.EnvironmentVariable{
+			{
+				Name:  proto.String("VAR"),
+				Value: proto.String("value"),
+			},
+		},
+		DockerCapability: []string{*proto.String("CAPABILITY")},
+		DockerImage:      proto.String("fabrizio2210/docker_light-default_container"),
+		ImageUseDocker:   proto.Bool(true),
+		Manual:           proto.Bool(true),
+	}
 	runner := &Docker{}
-	err := runner.Run(&input)
+	runner.projects_dir = "/opt/data/projects"
+	runner.projects_volume_string = "temp_projects_dir:/opt/data"
+	cmd, err := runner.Run(input)
 	if err != nil {
 		t.Errorf("Expected nil error, got %#v", err)
+	}
+	err = cmd.Wait()
+	if err != nil {
+		t.Errorf("Expected nil error after execution, got %v", err)
 	}
 }
 
@@ -37,28 +60,66 @@ func TestHelperProcess(t *testing.T) {
 	if os.Getenv("GO_WANT_HELPER_PROCESS") != "1" {
 		return
 	}
-	// some code here to check arguments perhaps?
 
-	// some code to emaulate output?
+	// Checking arguments.
+	want := []string{
+		"docker",
+		"run",
+		"--env", "MANUAL_TRIGGER=1",
+		"--env", "PROJECT_REPOSITORY=/opt/data/projects/222/repo",
+		"--env", "REPOSITORY=/opt/data/projects/repo",
+		"--env", "PROJECTS_VOLUME_STRING=temp_projects_dir:/opt/data",
+		"--env", "VAR=value",
+		"--pull", "always",
+		"-v", "temp_projects_dir:/opt/data",
+		"-v", "/var/run/docker.sock:/var/run/docker.sock",
+		"--cap-add", "CAPABILITY",
+		"fabrizio2210/docker_light-default_container",
+		"bash", "-c",
+		"'cd $(mktemp -d); git clone --recurse-submodules https://github.com/example ; cd * ; ./CICD.sh'",
+	}
+	diff := cmp.Diff(want, os.Args[3:])
+	if diff != "" {
+		fmt.Fprintf(os.Stderr, "Error, the arguments are different: %v", diff)
+		os.Exit(2)
+	}
+
+	// some code to emulate output?
 	// fmt.Fprintf(os.Stdout, dockerRunResult)
 
 	os.Exit(0)
 }
 
 type fakeDocker struct {
-	arg *executor.Execution
+	arg *epb.Execution
 }
 
-func (f *fakeDocker) Run(e *executor.Execution) error {
-	f.arg = e
-	return nil
+func (d *fakeDocker) ProjectDir(e *epb.Execution) string {
+	return ""
+}
+
+func (d *fakeDocker) ProjectRepoDir(e *epb.Execution) string {
+	return ""
+}
+
+func (d *fakeDocker) CentralRepoDir() string {
+	return ""
+}
+
+func (d *fakeDocker) ExecDir(e *epb.Execution) string {
+	return ""
+}
+
+func (d *fakeDocker) Run(e *epb.Execution) (*exec.Cmd, error) {
+	d.arg = e
+	return nil, nil
 }
 
 func TestWaitForJob(t *testing.T) {
-	inputExecution := &executor.Execution{
+	inputExecution := &epb.Execution{
 		Id:        proto.String("123"),
 		ProjectId: proto.String("222"),
-		EnvironmentVariable: []*executor.EnvironmentVariable{
+		EnvironmentVariable: []*epb.EnvironmentVariable{
 			{
 				Name:  proto.String("key"),
 				Value: proto.String("value_of_env"),

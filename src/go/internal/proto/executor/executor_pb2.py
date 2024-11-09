@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x65xecutor/executor.proto\x12\x08\x65xecutor\"2\n\x13\x45nvironmentVariable\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05value\x18\x02 \x01(\t\"\xc4\x01\n\tExecution\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nproject_id\x18\x02 \x01(\t\x12\x0f\n\x07scm_url\x18\x03 \x01(\t\x12\x18\n\x10image_use_docker\x18\x04 \x01(\x08\x12\x14\n\x0c\x64ocker_image\x18\x05 \x01(\t\x12;\n\x14\x65nvironment_variable\x18\x06 \x03(\x0b\x32\x1d.executor.EnvironmentVariable\x12\x19\n\x11\x64ocker_capability\x18\x07 \x03(\tBCZAgithub.com/fabrizio2210/light-CICD/src/go/internal/proto/executor')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x17\x65xecutor/executor.proto\x12\x08\x65xecutor\"2\n\x13\x45nvironmentVariable\x12\x0c\n\x04name\x18\x01 \x02(\t\x12\r\n\x05value\x18\x02 \x01(\t\"\xd4\x01\n\tExecution\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nproject_id\x18\x02 \x01(\t\x12\x0f\n\x07scm_url\x18\x03 \x01(\t\x12\x18\n\x10image_use_docker\x18\x04 \x01(\x08\x12\x14\n\x0c\x64ocker_image\x18\x05 \x01(\t\x12;\n\x14\x65nvironment_variable\x18\x06 \x03(\x0b\x32\x1d.executor.EnvironmentVariable\x12\x19\n\x11\x64ocker_capability\x18\x07 \x03(\t\x12\x0e\n\x06manual\x18\x08 \x01(\x08\x42\x43ZAgithub.com/fabrizio2210/light-CICD/src/go/internal/proto/executor')
 
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, globals())
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'executor.executor_pb2', globals())
@@ -24,5 +24,5 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _ENVIRONMENTVARIABLE._serialized_start=37
   _ENVIRONMENTVARIABLE._serialized_end=87
   _EXECUTION._serialized_start=90
-  _EXECUTION._serialized_end=286
+  _EXECUTION._serialized_end=302
 # @@protoc_insertion_point(module_scope)

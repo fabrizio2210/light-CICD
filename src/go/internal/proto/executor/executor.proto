@@ -16,4 +16,5 @@ message Execution {
   optional string docker_image = 5;
   repeated EnvironmentVariable environment_variable = 6;
   repeated string docker_capability = 7;
+  optional bool manual = 8;
 }
