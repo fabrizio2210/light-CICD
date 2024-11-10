@@ -83,6 +83,8 @@ services:
     image: fabrizio2210/light_cicd-executor-dev
     environment:
       REDIS_HOST: redis
+      PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
+      PROJECTS_PATH: "/opt/data/projects"
     volumes:
       - ../../src/go:/usr/src/app
     networks:

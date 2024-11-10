@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"testing"
@@ -25,6 +26,12 @@ func fakeExecCommand(command string, args ...string) *exec.Cmd {
 	return cmd
 }
 
+type fakeWriter struct{}
+
+func (f *fakeWriter) Write(path string, vlaue string) error {
+	return nil
+}
+
 func TestRunDocker(t *testing.T) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
@@ -46,9 +53,11 @@ func TestRunDocker(t *testing.T) {
 	runner := &Docker{}
 	runner.projects_dir = "/opt/data/projects"
 	runner.projects_volume_string = "temp_projects_dir:/opt/data"
-	cmd, err := runner.Run(input)
+	fs := &fakeWriter{}
+	cmd, err := runner.Run(input, os.Stdout, fs)
 	if err != nil {
 		t.Errorf("Expected nil error, got %#v", err)
+		t.FailNow()
 	}
 	err = cmd.Wait()
 	if err != nil {
@@ -110,9 +119,15 @@ func (d *fakeDocker) ExecDir(e *epb.Execution) string {
 	return ""
 }
 
-func (d *fakeDocker) Run(e *epb.Execution) (*exec.Cmd, error) {
+func (d *fakeDocker) Output(e *epb.Execution) (io.Writer, error) {
+	return os.Stdout, nil
+}
+
+func (d *fakeDocker) Run(e *epb.Execution, out io.Writer, fs Writer) (*exec.Cmd, error) {
 	d.arg = e
-	return nil, nil
+	cmd := exec.Command("echo")
+	cmd.Start()
+	return cmd, nil
 }
 
 func TestWaitForJob(t *testing.T) {

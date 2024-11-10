@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
+	"time"
 
 	epb "github.com/fabrizio2210/light-CICD/src/go/internal/proto/executor"
 	"github.com/fabrizio2210/light-CICD/src/go/internal/rediswrapper"
@@ -15,11 +17,12 @@ import (
 var execCommand = exec.Command
 
 type Executor interface {
-	Run(*epb.Execution) (*exec.Cmd, error)
+	Run(*epb.Execution, io.Writer, Writer) (*exec.Cmd, error)
 	ProjectDir(*epb.Execution) string
 	ProjectRepoDir(*epb.Execution) string
 	CentralRepoDir() string
 	ExecDir(*epb.Execution) string
+	Output(*epb.Execution) (io.Writer, error)
 }
 
 type Docker struct {
@@ -43,7 +46,15 @@ func (d *Docker) ExecDir(e *epb.Execution) string {
 	return fmt.Sprintf("%s/%s", d.ProjectDir(e), e.GetId())
 }
 
-func (d *Docker) Run(e *epb.Execution) (*exec.Cmd, error) {
+func (d *Docker) Output(e *epb.Execution) (io.Writer, error) {
+	f, err := os.Create(d.ExecDir(e) + "/output")
+	if err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func (d *Docker) Run(e *epb.Execution, output io.Writer, file Writer) (*exec.Cmd, error) {
 	command_array := []string{"run"}
 
 	// Build the command line
@@ -66,11 +77,7 @@ func (d *Docker) Run(e *epb.Execution) (*exec.Cmd, error) {
 	for _, c := range e.GetDockerCapability() {
 		command_array = append(command_array, "--cap-add", c)
 	}
-	if e.GetDockerImage() != "" {
-		command_array = append(command_array, e.GetDockerImage())
-	} else {
-		command_array = append(command_array, "fabrizio2210/docker_light-default_container")
-	}
+	command_array = append(command_array, e.GetDockerImage())
 	command_array = append(command_array,
 		"bash", "-c",
 		fmt.Sprintf("'cd $(mktemp -d); git clone --recurse-submodules %s ; cd * ; ./CICD.sh'", e.GetScmUrl()),
@@ -78,7 +85,17 @@ func (d *Docker) Run(e *epb.Execution) (*exec.Cmd, error) {
 	// End of build of the command line
 	cmd := execCommand("docker", command_array...)
 	log.Printf("Command about be executed: %v\n", cmd)
-	err := cmd.Start()
+	err := file.Write(d.ExecDir(e)+"/start_time", fmt.Sprint(time.Now().Unix()))
+	if err != nil {
+		return nil, err
+	}
+	err = file.Write(d.ExecDir(e)+"/commandline", cmd.String())
+	if err != nil {
+		return nil, err
+	}
+	cmd.Stdout = output
+	cmd.Stderr = output
+	err = cmd.Start()
 	return cmd, err
 }
 
@@ -91,16 +108,66 @@ func WaitForJob(executor Executor) error {
 	fmt.Printf("Execution: %v\n", e)
 	execution := &epb.Execution{}
 	prototext.Unmarshal([]byte(e), execution)
-	_, err = executor.Run(execution)
-	return err
+	output, err := executor.Output(execution)
+	if err != nil {
+		return err
+	}
+	fs := &Filesystem{}
+	cmd, err := executor.Run(execution, output, fs)
+	if err != nil {
+		return err
+	}
+	go WaitForExecution(cmd, execution, executor, fs)
+	return nil
+}
+
+type Writer interface {
+	Write(string, string) error
+}
+
+type Filesystem struct {
+}
+
+func (o Filesystem) Write(path string, content string) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return fmt.Errorf("impossible to create %s: %v", path, err)
+	}
+	defer f.Close()
+	_, err = f.WriteString(content)
+	if err != nil {
+		return fmt.Errorf("impossible to write %s: %v", path, err)
+	}
+	return nil
+}
+
+func WaitForExecution(cmd *exec.Cmd, e *epb.Execution, executor Executor, file Writer) {
+	if err := cmd.Wait(); err != nil {
+		if exiterr, ok := err.(*exec.ExitError); ok {
+			log.Printf("Exit Status: %d", exiterr.ExitCode())
+			err := file.Write(executor.ExecDir(e)+"/rc", fmt.Sprint(exiterr.ExitCode()))
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+			err = file.Write(executor.ExecDir(e)+"/stop_time", fmt.Sprint(time.Now().Unix()))
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+		} else {
+			log.Fatalf("cmd.Wait for %v: %v", e, err)
+		}
+	}
 }
 
 func main() {
-	fmt.Println("This is an executor")
+	log.Println("This is an executor")
 	rediswrapper.RedisClient = rediswrapper.ConnectRedis("redis:6379")
-	fmt.Printf("Redis client: %+v\n", rediswrapper.RedisClient)
+	log.Printf("Redis client: %+v\n", rediswrapper.RedisClient)
 	docker := &Docker{}
 	docker.projects_dir = os.Getenv("PROJECTS_PATH")
 	docker.projects_volume_string = os.Getenv("PROJECTS_VOLUME_STRING")
-	WaitForJob(docker)
+	err := WaitForJob(docker)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 }
