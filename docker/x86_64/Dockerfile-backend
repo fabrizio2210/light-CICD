@@ -1,5 +1,4 @@
 FROM debian
-MAINTAINER fabrizio2210
 ENV DOCKERVERSION=20.10.2
 ARG DOCKERARCH
 
@@ -11,7 +10,7 @@ RUN apt-get update && apt-get install -y nginx \
     sed \
     curl \
     supervisor \
-    python3.9 \
+    python3 \
     python3-pip \
     python3-setuptools \
     python3-setuptools \
