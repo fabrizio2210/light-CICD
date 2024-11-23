@@ -35,9 +35,7 @@ RUN mkdir ${SOCKET_FOLDER} && chmod 755 ${SOCKET_FOLDER} && chown www-data ${SOC
 
 RUN python3 -m venv ${APP_FOLDER}/venv
 
-RUN ${APP_FOLDER}/venv/bin/pip install wheel
-
-RUN ${APP_FOLDER}/venv/bin/pip install -r ${APP_FOLDER}/requirements.txt
+RUN ${APP_FOLDER}/venv/bin/pip install -r ${APP_FOLDER}/requirements.txt --use-pep517
 
 # UWSGI
 COPY docker/lib/uwsgi.ini ${ETC_FOLDER}/
