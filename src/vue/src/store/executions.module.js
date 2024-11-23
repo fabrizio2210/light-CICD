@@ -5,9 +5,13 @@ export const executions = {
   namespaced: true,
   state: {
     all: { executions_dicts: {} },
-    status: {}
+    status: {},
+    fillOutputSizeID: 0
   },
   actions: {
+    setFillOutputSizeID({ commit }, { fillOutputSizeID }) {
+      commit("storeFillOutputSizeID", fillOutputSizeID);
+    },
     executing({ dispatch, commit }, { project_id }) {
       commit("executingRequest", {});
       executionService.exec(project_id).then(
@@ -41,6 +45,9 @@ export const executions = {
     }
   },
   mutations: {
+    storeFillOutputSizeID(state, fillOutputSizeID) {
+      state.fillOutputSizeID = fillOutputSizeID;
+    },
     executingRequest(state) {
       state.status = { executing: true };
     },

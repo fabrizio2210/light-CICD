@@ -44,9 +44,13 @@
 <script>
 export default {
   data() {
-    return {};
+    return {
+    };
   },
   computed: {
+    fillOutputSizeID() {
+      return this.$store.state.executions.fillOutputSizeID;
+    },
     avg_size() {
       if (this.ordered_executions && this.execution_outputs) {
         let sum_size = 0;
@@ -168,7 +172,17 @@ export default {
     this.$store.dispatch("executions/getAll", { project_id });
   },
   mounted() {
-    setInterval(this.fillOutputSize, 5000);
+    if (this.fillOutputSizeID == 0) {
+      var fillOutputSizeID = setInterval(this.fillOutputSize, 5000);
+      this.$store.dispatch("executions/setFillOutputSizeID", { fillOutputSizeID });
+    }
+  },
+  beforeDestroy() {
+    if (this.fillOutputSizeID != 0) {
+      clearInterval(this.fillOutputSizeID);
+      const fillOutputSizeID = 0;
+      this.$store.dispatch("executions/setFillOutputSizeID", { fillOutputSizeID } );
+    }
   }
 };
 </script>
