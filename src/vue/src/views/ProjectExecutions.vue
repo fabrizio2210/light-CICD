@@ -44,8 +44,7 @@
 <script>
 export default {
   data() {
-    return {
-    };
+    return {};
   },
   computed: {
     fillOutputSizeID() {
@@ -174,14 +173,18 @@ export default {
   mounted() {
     if (this.fillOutputSizeID == 0) {
       var fillOutputSizeID = setInterval(this.fillOutputSize, 5000);
-      this.$store.dispatch("executions/setFillOutputSizeID", { fillOutputSizeID });
+      this.$store.dispatch("executions/setFillOutputSizeID", {
+        fillOutputSizeID
+      });
     }
   },
   beforeDestroy() {
     if (this.fillOutputSizeID != 0) {
       clearInterval(this.fillOutputSizeID);
       const fillOutputSizeID = 0;
-      this.$store.dispatch("executions/setFillOutputSizeID", { fillOutputSizeID } );
+      this.$store.dispatch("executions/setFillOutputSizeID", {
+        fillOutputSizeID
+      });
     }
   }
 };
