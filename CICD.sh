@@ -46,7 +46,7 @@ docker build -t fabrizio2210/light_cicd-backend:${arch} -f docker/x86_64/Dockerf
 ######
 # Test
 
-docker run fabrizio2210/light_cicd-backend:${arch} python3 /opt/web/tests/test-app.py
+docker run fabrizio2210/light_cicd-backend:${arch} /opt/web/venv/bin/python3 /opt/web/tests/test-app.py
 
 ######
 # Push
