@@ -80,7 +80,7 @@ func (d *Docker) Run(e *epb.Execution, output io.Writer, file Writer) (*exec.Cmd
 	command_array = append(command_array, e.GetDockerImage())
 	command_array = append(command_array,
 		"bash", "-c",
-		fmt.Sprintf("'cd $(mktemp -d); git clone --recurse-submodules %s ; cd * ; ./CICD.sh'", e.GetScmUrl()),
+		fmt.Sprintf("cd $(mktemp -d); git clone --recurse-submodules %s ; cd * ; ./CICD.sh", e.GetScmUrl()),
 	)
 	// End of build of the command line
 	cmd := execCommand("docker", command_array...)
@@ -96,23 +96,44 @@ func (d *Docker) Run(e *epb.Execution, output io.Writer, file Writer) (*exec.Cmd
 	cmd.Stdout = output
 	cmd.Stderr = output
 	err = cmd.Start()
+	file.Write(d.ExecDir(e)+"/hostname", os.Getenv("HOSTNAME"))
+	file.Write(d.ExecDir(e)+"/parameters", e.String())
 	return cmd, err
 }
 
-func WaitForJob(executor Executor) error {
-	ctx := context.Background()
+func WaitForJob(ctx context.Context, executor Executor, fs Writer) error {
 	e, err := rediswrapper.WaitFor(ctx, "executions")
 	if err != nil {
-		log.Printf("Error: %v\n", err)
+		log.Fatalf("Error: %v\n", err)
 	}
-	fmt.Printf("Execution: %v\n", e)
+	log.Printf("Execution: %v\n", e)
 	execution := &epb.Execution{}
-	prototext.Unmarshal([]byte(e), execution)
+	err = prototext.Unmarshal([]byte(e), execution)
+	if err != nil {
+		return err
+	}
+	log.Printf("Execution: %v", execution.String())
+	log.Printf("ProjectDir: %v", executor.ProjectDir(execution))
+	err = fs.CreateDir(executor.ProjectDir(execution))
+	if err != nil {
+		return err
+	}
+	err = fs.CreateDir(executor.ExecDir(execution))
+	if err != nil {
+		return err
+	}
+	err = fs.CreateDir(executor.ProjectRepoDir(execution))
+	if err != nil {
+		return err
+	}
+	err = fs.CreateDir(executor.CentralRepoDir())
+	if err != nil {
+		return err
+	}
 	output, err := executor.Output(execution)
 	if err != nil {
 		return err
 	}
-	fs := &Filesystem{}
 	cmd, err := executor.Run(execution, output, fs)
 	if err != nil {
 		return err
@@ -123,6 +144,7 @@ func WaitForJob(executor Executor) error {
 
 type Writer interface {
 	Write(string, string) error
+	CreateDir(string) error
 }
 
 type Filesystem struct {
@@ -141,7 +163,12 @@ func (o Filesystem) Write(path string, content string) error {
 	return nil
 }
 
+func (o Filesystem) CreateDir(path string) error {
+	return os.MkdirAll(path, 0o755)
+}
+
 func WaitForExecution(cmd *exec.Cmd, e *epb.Execution, executor Executor, file Writer) {
+	file.Write(executor.ExecDir(e)+"/pid", fmt.Sprint(cmd.Process.Pid))
 	if err := cmd.Wait(); err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			log.Printf("Exit Status: %d", exiterr.ExitCode())
@@ -166,8 +193,12 @@ func main() {
 	docker := &Docker{}
 	docker.projects_dir = os.Getenv("PROJECTS_PATH")
 	docker.projects_volume_string = os.Getenv("PROJECTS_VOLUME_STRING")
-	err := WaitForJob(docker)
-	if err != nil {
-		log.Fatalln(err.Error())
+	ctx := context.Background()
+	fs := &Filesystem{}
+	for {
+		err := WaitForJob(ctx, docker, fs)
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
 	}
 }

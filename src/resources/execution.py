@@ -73,7 +73,7 @@ class NewExecution(Resource):
     # Create a new execution
     execution = ExecutionModel(project_id=project_id)
     try:
-      execution.exec()
+      execution.exec(manual=True)
     except Exception as e:
       logging.error(repr(e))
       return {"message": "Error doing the execution: %s." % repr(e)}, 500

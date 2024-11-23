@@ -13,6 +13,9 @@ from models.project_setting_map import ProjectSettingMap
 from models.main_setting import MainSettingModel
 from models.environment import EnvironmentModel
 from models.setting import SettingModel
+from models.redis import RedisModel
+from go.internal.proto.executor import executor_pb2
+from google.protobuf import text_format
 from shlex import quote
 
 def preexec_function():
@@ -109,86 +112,23 @@ class ExecutionModel():
       raise ValueError("Not possible to rexecute the same execution")
     self.id = ExecutionModel.getUniqueID(self.project_id)
     logging.info(self.id)
-    self.start_time = int(datetime.now().timestamp())
-    exec_dir = self.exec_dir_format.format(root_dir=ExecutionModel.projects_dir,
-                  prj=self.project_id,
-                  exc=self.id)
-    project_repo_dir = self.project_repo_dir_format.format(root_dir=ExecutionModel.projects_dir,
-                  prj=self.project_id)
-    central_repo_dir = self.central_repo_dir_format.format(root_dir=ExecutionModel.projects_dir)
 
-    # Creation of the environment
-    envs = ProjectEnvironmentMap.get_environments_by_project_id(self.project_id)
-    if manual:
-      envs.append(EnvironmentModel(id=None, name="MANUAL_TRIGGER", value="1"))
-    envs.append(EnvironmentModel(id=None, name="PROJECT_REPOSITORY", value=project_repo_dir))
-    envs.append(EnvironmentModel(id=None, name="REPOSITORY", value=central_repo_dir))
-    if ExecutionModel.projects_volume_string:
-      envs.append(EnvironmentModel(id=None, name="PROJECTS_VOLUME_STRING", value=ExecutionModel.projects_volume_string))
-
-    d_envs = []
-    for env in envs:
-      d_envs.append("--env")
-      d_envs.append(quote("{}={}".format(env.name, env.value)))
-
-    if image_use_docker.value:
-      d_envs.append("-v")
-      d_envs.append("/var/run/docker.sock:/var/run/docker.sock")
-    if ExecutionModel.projects_volume_string:
-      d_envs.append("-v")
-      d_envs.append(quote(ExecutionModel.projects_volume_string))
-
-    d_envs.append("--pull")
-    d_envs.append("always")
-
-    if docker_capabilities.value:
-      for capability in docker_capabilities.value.split(","):
-        d_envs.append("--cap-add")
-        d_envs.append(quote(capability))
-
-    # Creation of the directory structure
-    Path(exec_dir).mkdir(parents=True, exist_ok=True)
-    Path(project_repo_dir).mkdir(parents=True, exist_ok=True)
-    Path(central_repo_dir).mkdir(parents=True, exist_ok=True)
-
-    # Creation of the output file
-    stdout_fh = open(exec_dir + "/output" , "w")
-
-    # Creation of the internal command
-    d_command = quote("cd $(mktemp -d); git clone --recurse-submodules {} ; cd * ; ./CICD.sh".format(quote(scm_url.value)))
-    command_array = ["docker", 
-                      "run", 
-                      *d_envs,
-                      docker_image.value, 
-                      "bash", 
-                      "-c",
-                      d_command]
-    self.commandline = " ".join(command_array) + \
-              "; echo $?  > " + exec_dir + "/rc " + \
-              "; date +%s > " + exec_dir + "/stop_time"
-
-    # Storing the execution information
-    with open(exec_dir + "/start_time", "w") as f:
-      f.write(str(self.start_time))
-    with open(exec_dir + "/settings", "w") as f:
-      json.dump({ self.settings[s].name: 
-                  self.settings[s].json() for s in self.settings }, f, indent = 6)
-    with open(exec_dir + "/commandline", "w") as f:
-      f.write(str(self.commandline))
-    with open(exec_dir + "/hostname", "w") as f:
-      f.write(str(os.getenv("HOSTNAME")))
-
-    # Execution
-    logging.info("Command executed: {}".format(repr(self.commandline)))
-    process = subprocess.Popen(self.commandline,
-                      shell = True,
-                      preexec_fn = preexec_function,
-                      stdout = stdout_fh,
-                      stderr = stdout_fh)
-
-    # Saving the PID
-    with open(exec_dir + "/pid", "w") as f:
-      f.write(str(process.pid))
+    e = executor_pb2.Execution()
+    e.id = f"{self.id:0>20}"
+    e.project_id = str(self.project_id)
+    e.scm_url = scm_url.value
+    e.image_use_docker = image_use_docker.value
+    e.docker_image = docker_image.value
+    for env in ProjectEnvironmentMap.get_environments_by_project_id(self.project_id):
+      v = executor_pb2.EnvironmentVariable()
+      v.name = env.name
+      v.value = env.value
+      e.environment_variable.append(v)
+    for capability in docker_capabilities.value.split(","):
+      if capability != "":
+        e.docker_capability.append(capability)
+    e.manual = manual == True
+    RedisModel.enque("executions", text_format.MessageToString(e))
 
   @classmethod
   def find_executions_by_project_id(cls, project_id):
@@ -227,7 +167,10 @@ class ExecutionModel():
         stop_time = int(cls.readAttribute(exec_dir, "stop_time"))
       except:
         stop_time = None
-      j_settings = json.loads(cls.readAttribute(exec_dir, "settings"))
+      try:
+        j_settings = json.loads(cls.readAttribute(exec_dir, "settings"))
+      except:
+        j_settings = []
       settings = {}
       for s in j_settings:
         settings[s] = SettingModel(**j_settings[s])

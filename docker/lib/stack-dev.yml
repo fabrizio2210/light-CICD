@@ -74,7 +74,6 @@ services:
       PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
     volumes:
       - ../../src:/opt/web
-      - /var/run/docker.sock:/var/run/docker.sock
       - temp_projects_dir:/opt/data
     networks: 
       - backends
@@ -87,6 +86,8 @@ services:
       PROJECTS_PATH: "/opt/data/projects"
     volumes:
       - ../../src/go:/usr/src/app
+      - temp_projects_dir:/opt/data
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - backends
 

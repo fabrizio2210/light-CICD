@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -32,6 +33,10 @@ func (f *fakeWriter) Write(path string, vlaue string) error {
 	return nil
 }
 
+func (f *fakeWriter) CreateDir(string) error {
+	return nil
+}
+
 func TestRunDocker(t *testing.T) {
 	execCommand = fakeExecCommand
 	defer func() { execCommand = exec.Command }()
@@ -56,7 +61,7 @@ func TestRunDocker(t *testing.T) {
 	fs := &fakeWriter{}
 	cmd, err := runner.Run(input, os.Stdout, fs)
 	if err != nil {
-		t.Errorf("Expected nil error, got %#v", err)
+		t.Errorf("Expected nil error, got %v", err)
 		t.FailNow()
 	}
 	err = cmd.Wait()
@@ -85,7 +90,7 @@ func TestHelperProcess(t *testing.T) {
 		"--cap-add", "CAPABILITY",
 		"fabrizio2210/docker_light-default_container",
 		"bash", "-c",
-		"'cd $(mktemp -d); git clone --recurse-submodules https://github.com/example ; cd * ; ./CICD.sh'",
+		"cd $(mktemp -d); git clone --recurse-submodules https://github.com/example ; cd * ; ./CICD.sh",
 	}
 	diff := cmp.Diff(want, os.Args[3:])
 	if diff != "" {
@@ -149,7 +154,11 @@ func TestWaitForJob(t *testing.T) {
 	}
 	redisMock.ExpectBLPop(0, "executions").SetVal([]string{"executions", string(text)})
 	fakeInterface := &fakeDocker{}
-	WaitForJob(fakeInterface)
+	fakeWriter := &fakeWriter{}
+	err = WaitForJob(context.Background(), fakeInterface, fakeWriter)
+	if err != nil {
+		t.Errorf("Error during execution of WaitForJob: %v", err)
+	}
 	diff := cmp.Diff(fakeInterface.arg, inputExecution, protocmp.Transform())
 	if diff != "" {
 		t.Errorf("Argument passed to WaitForJob is different: %v", diff)
