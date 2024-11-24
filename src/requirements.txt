@@ -1,5 +1,6 @@
 aniso8601
 asyncio
+pyjwt
 Click
 Flask
 Flask-RESTful
