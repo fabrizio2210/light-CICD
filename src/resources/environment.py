@@ -28,14 +28,14 @@ class Environment(Resource):
                       help="This field cannot be left blank!"
                       )
 
-  @jwt_required
+  @jwt_required()
   def get(self, id):
     envs = EnvironmentModel.find_by_id(id)
     if envs:
       return {'environment': envs[0].json()}
     return {'message': 'Environment not found'}, 404
 
-  @jwt_required
+  @jwt_required()
   def delete(self, id):
     # Check the owner
     project_maps = ProjectEnvironmentMap.find_projectmaps_id_by_environment_id(id)
@@ -50,7 +50,7 @@ class Environment(Resource):
       return {'message': 'Environment deleted.'}, 200
     return {'message': 'Environment not found.'}, 404
 
-  @jwt_required
+  @jwt_required()
   def put(self, id):
     # Check the owner
     project_maps = ProjectEnvironmentMap.find_projectmaps_id_by_environment_id(id)
@@ -86,7 +86,7 @@ class Environment(Resource):
 
 class EnvironmentList(Resource):
 
-  @jwt_required
+  @jwt_required()
   def get(self, project_id):
     if len(ProjectModel.find_by_id(project_id)) == 0:
       return {'message': 'Project not found'}, 404
@@ -117,7 +117,7 @@ class NewEnvironment(Resource):
                       help="Description of the environment variable"
                       )
 
-  @jwt_required
+  @jwt_required()
   def post(self, project_id):
     projects = ProjectModel.find_by_id(project_id)
     if not projects:

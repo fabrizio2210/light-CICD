@@ -16,7 +16,7 @@ class ProjectSetting(Resource):
                       help="This field cannot be left blank!"
                       )
 
-  @jwt_required
+  @jwt_required()
   def get(self, project_id, name):
     # Check if project owner
     owner_maps = UserProjectMap.find_user_id_by_project_id(project_id)
@@ -32,7 +32,7 @@ class ProjectSetting(Resource):
 
     return {'setting': setting.json()}
 
-  @jwt_required
+  @jwt_required()
   def put(self, project_id, name):
     # Check if project owner
     owner_maps = UserProjectMap.find_user_id_by_project_id(project_id)
@@ -71,7 +71,7 @@ class ProjectSetting(Resource):
 
 class ProjectSettingList(Resource):
 
-    @jwt_required
+    @jwt_required()
     def get(self, project_id):
       if len(ProjectModel.find_by_id(project_id)) == 0:
         return {'message': 'Project not found'}, 404

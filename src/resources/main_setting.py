@@ -12,14 +12,14 @@ class MainSetting(Resource):
                       help="This field cannot be left blank!"
                       )
 
-  @jwt_required
+  @jwt_required()
   def get(self, name):
     settings = MainSettingModel.get_setting_by_name(name)
     if settings:
       return settings[0].json()
     return {'message': 'Item not found'}, 404
 
-  @jwt_required
+  @jwt_required()
   def put(self, name):
     data = MainSetting.parser.parse_args()
     users = UserModel.find_by_id(get_jwt_identity())
@@ -36,7 +36,7 @@ class MainSetting(Resource):
 
 class MainSettingList(Resource):
 
-    @jwt_required
+    @jwt_required()
     def get(self):
       return {'settings': list(map(lambda x: x.json(), MainSettingModel.get_all_settings()))}
 

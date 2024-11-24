@@ -7,7 +7,7 @@ from models.project import ProjectModel
 
 class Execution(Resource):
 
-  @jwt_required
+  @jwt_required()
   def get(self, project_id, id):
     if len(ProjectModel.find_by_id(project_id)) == 0:
       return {'message': 'Project not found'}, 404
@@ -16,7 +16,7 @@ class Execution(Resource):
       return { 'execution': executions[0].json()}
     return {'message': 'Execution not found'}, 404
 
-  @jwt_required
+  @jwt_required()
   def delete(self, project_id, id):
     if len(ProjectModel.find_by_id(project_id)) == 0:
       return {'message': 'Project not found'}, 404
@@ -40,7 +40,7 @@ class ExecutionOutput(Resource):
                       help="Express the last byte to retrieve "
                       )
 
-  @jwt_required
+  @jwt_required()
   def get(self, project_id, id):
     data = ExecutionOutput.parser.parse_args()
     if len(ProjectModel.find_by_id(project_id)) == 0:
@@ -53,7 +53,7 @@ class ExecutionOutput(Resource):
 
 class ExecutionList(Resource):
 
-  @jwt_required
+  @jwt_required()
   def get(self, project_id):
     if len(ProjectModel.find_by_id(project_id)) == 0:
       return {'message': 'Project not found'}, 404
@@ -64,7 +64,7 @@ class ExecutionList(Resource):
 
 class NewExecution(Resource):
 
-  @jwt_required
+  @jwt_required()
   def post(self, project_id):
     if not ProjectModel.find_by_id(project_id):
       return {'message': 

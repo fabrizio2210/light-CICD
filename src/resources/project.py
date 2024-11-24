@@ -19,7 +19,7 @@ class Project(Resource):
                       help="If the project is enabled or not "
                       )
 
-  @jwt_required
+  @jwt_required()
   def get(self, id):
     project = ProjectModel.find_by_id(id)
     if project:
@@ -46,7 +46,7 @@ class Project(Resource):
 
 class ProjectList(Resource):
 
-    @jwt_required
+    @jwt_required()
     def get(self):
       return {'projects': list(map(lambda x: x.json(), ProjectModel.get_projects_by_user_id(get_jwt_identity())))}
 
@@ -65,7 +65,7 @@ class NewProject(Resource):
                       help="If the project is enabled or not "
                       )
 
-  @jwt_required
+  @jwt_required()
   def post(self):
     data = NewProject.parser.parse_args()
     user_id = get_jwt_identity()
