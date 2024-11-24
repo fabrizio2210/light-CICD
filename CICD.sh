@@ -42,11 +42,13 @@ fi
 
 docker build -t fabrizio2210/light_cicd-frontend:${arch} -f docker/x86_64/Dockerfile-frontend .
 docker build -t fabrizio2210/light_cicd-backend:${arch} -f docker/x86_64/Dockerfile-backend --build-arg DOCKERARCH=${dockerArch} .
+docker build -t fabrizio2210/light_cicd-executor:${arch} -f docker/x86_64/Dockerfile-executor .
 
 ######
 # Test
 
 docker run fabrizio2210/light_cicd-backend:${arch} /opt/web/venv/bin/python3 /opt/web/tests/test-app.py
+docker run fabrizio2210/light_cicd-executor:${arch} go test -v
 
 ######
 # Push
