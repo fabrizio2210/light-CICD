@@ -13,7 +13,6 @@ RUN apt-get update && apt-get install -y nginx \
     python3-setuptools \
     libpcre3 \
     libpcre3-dev \
-    python3-itsdangerous \
     python3-six \
     python3-psutil \
     python3-redis \
