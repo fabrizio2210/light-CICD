@@ -1,5 +1,4 @@
 from flask_restful import Resource, reqparse
-from flask_jwt import  current_identity
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.project import ProjectModel
 from models.user_project_map import UserProjectMap
