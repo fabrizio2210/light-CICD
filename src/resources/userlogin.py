@@ -1,3 +1,4 @@
+import hmac
 from models.user import UserModel
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import (
@@ -5,7 +6,9 @@ from flask_jwt_extended import (
     create_refresh_token,
     get_jwt_identity
 )
-from werkzeug.security import safe_str_cmp
+
+str_to_bytes = lambda s: s.encode("utf-8") if isinstance(s, str) else s
+safe_str_cmp = lambda a, b: hmac.compare_digest(str_to_bytes(a), str_to_bytes(b))
 
 class UserLogin(Resource):
     # defining the request parser and expected arguments in the request
