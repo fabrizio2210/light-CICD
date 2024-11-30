@@ -36,7 +36,7 @@ GenericExternal.set_webhook_secret(os.getenv('GENERIC_WEBHOOK_SECRET', ''))
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 app.config['JWT_HEADER_TYPE'] = "JWT"
-app.config['JWT_IDENTITY_CLAIM'] = "jti"
+app.config['JWT_IDENTITY_CLAIM'] = "identity"
 app.secret_key = os.getenv('JWT_SECRET', 'Qw2sGsa7ED34f6dAfgFSdLopdAdg')
 api = Api(app)
 
