@@ -55,6 +55,7 @@ docker run fabrizio2210/light_cicd-executor:${arch} go test -v
 
 docker push fabrizio2210/light_cicd-frontend:${arch}
 docker push fabrizio2210/light_cicd-backend:${arch}
+docker push fabrizio2210/light_cicd-executor:${arch}
 
 #################
 # Cleaning Docker
