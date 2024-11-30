@@ -2,12 +2,11 @@ aniso8601
 asyncio
 pyjwt
 Click
-Flask
+Flask==3.1.0
 Flask-RESTful
-Flask-JWT
 Flask-JWT-Extended==4.7.0
 Flask-Cors
-itsdangerous==2.0.1
+itsdangerous
 Jinja2
 MarkupSafe
 pytz

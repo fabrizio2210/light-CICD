@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
-from flask_jwt import JWT
 from flask_cors import CORS
 import logging
 import os
@@ -36,7 +35,8 @@ GenericExternal.set_webhook_secret(os.getenv('GENERIC_WEBHOOK_SECRET', ''))
 
 app = Flask(__name__)
 app.config['PROPAGATE_EXCEPTIONS'] = True
-app.config['JWT_HEADER_TYPE'] = "JWT" 
+app.config['JWT_HEADER_TYPE'] = "JWT"
+app.config['JWT_IDENTITY_CLAIM'] = "jti"
 app.secret_key = os.getenv('JWT_SECRET', 'Qw2sGsa7ED34f6dAfgFSdLopdAdg')
 api = Api(app)
 
