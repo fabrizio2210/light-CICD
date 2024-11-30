@@ -15,9 +15,6 @@ services:
       - backends
 
   flask:
-    depends_on:
-        redis:
-          condition: service_started
     image: fabrizio2210/light_cicd-backend-dev
     command: python3 /opt/web/tests/test-app.py
     deploy:
@@ -31,11 +28,6 @@ services:
     volumes:
       - ../../src:/opt/web
     networks: 
-      - backends
-
-  redis:
-    image: redis
-    networks:
       - backends
 
 networks:
