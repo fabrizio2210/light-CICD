@@ -47,7 +47,7 @@ class GenericExternal(Resource):
     envs = []
     for env_string in data_envs:
       parts = env_string.split("=")
-      if len(parts) > 2:
+      if len(parts) > 1:
         env = EnvironmentModel(parts[0], parts[0], parts[1])
         envs.append(env)
       else:
