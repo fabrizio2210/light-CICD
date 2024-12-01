@@ -168,7 +168,10 @@ func (o Filesystem) CreateDir(path string) error {
 }
 
 func WaitForExecution(cmd *exec.Cmd, e *epb.Execution, executor Executor, file Writer) {
-	file.Write(executor.ExecDir(e)+"/pid", fmt.Sprint(cmd.Process.Pid))
+	err := file.Write(executor.ExecDir(e)+"/pid", fmt.Sprint(cmd.Process.Pid))
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
 	if err := cmd.Wait(); err != nil {
 		if exiterr, ok := err.(*exec.ExitError); ok {
 			log.Printf("Exit Status: %d", exiterr.ExitCode())
@@ -176,13 +179,19 @@ func WaitForExecution(cmd *exec.Cmd, e *epb.Execution, executor Executor, file W
 			if err != nil {
 				log.Fatalln(err.Error())
 			}
-			err = file.Write(executor.ExecDir(e)+"/stop_time", fmt.Sprint(time.Now().Unix()))
-			if err != nil {
-				log.Fatalln(err.Error())
-			}
 		} else {
 			log.Fatalf("cmd.Wait for %v: %v", e, err)
 		}
+	}
+	err = file.Write(executor.ExecDir(e)+"/stop_time", fmt.Sprint(time.Now().Unix()))
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	// if no errors, it must be a return code == 0.
+	log.Printf("Exit Status: %d", 0)
+	err = file.Write(executor.ExecDir(e)+"/rc", fmt.Sprint(0))
+	if err != nil {
+		log.Fatalln(err.Error())
 	}
 }
 
