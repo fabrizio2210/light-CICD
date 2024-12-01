@@ -182,17 +182,19 @@ func WaitForExecution(cmd *exec.Cmd, e *epb.Execution, executor Executor, file W
 		} else {
 			log.Fatalf("cmd.Wait for %v: %v", e, err)
 		}
+	} else {
+		// if no errors, it must be a return code == 0.
+		log.Printf("Exit Status: %d", 0)
+		err = file.Write(executor.ExecDir(e)+"/rc", fmt.Sprint(0))
+		if err != nil {
+			log.Fatalln(err.Error())
+		}
 	}
 	err = file.Write(executor.ExecDir(e)+"/stop_time", fmt.Sprint(time.Now().Unix()))
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	// if no errors, it must be a return code == 0.
-	log.Printf("Exit Status: %d", 0)
-	err = file.Write(executor.ExecDir(e)+"/rc", fmt.Sprint(0))
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
+
 }
 
 func main() {
