@@ -42,7 +42,7 @@ fi
 
 docker build -t fabrizio2210/light_cicd-frontend:${arch} -f docker/x86_64/Dockerfile-frontend .
 docker build -t fabrizio2210/light_cicd-backend:${arch} -f docker/x86_64/Dockerfile-backend --build-arg DOCKERARCH=${dockerArch} .
-docker build -t fabrizio2210/light_cicd-executor:${arch} -f docker/x86_64/Dockerfile-executor .
+docker build -t fabrizio2210/light_cicd-executor:${arch} -f docker/x86_64/Dockerfile-executor --build-arg DOCKERARCH=${dockerArch} .
 
 ######
 # Test
