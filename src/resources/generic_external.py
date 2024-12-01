@@ -7,6 +7,7 @@ from flask_restful import Resource, reqparse
 from models.execution import ExecutionModel
 from models.project import ProjectModel
 from models.project_setting_map import ProjectSettingMap
+from models.environment import EnvironmentModel
 from models.setting import SettingModel
 
 
@@ -18,6 +19,10 @@ class GenericExternal(Resource):
   parser.add_argument('Signature-256',
                       location='headers',
                       required=True)
+  parser.add_argument('envs',
+                      location='json',
+                      type=list,
+                      required=False)
   hmac = None
 
 
@@ -37,6 +42,16 @@ class GenericExternal(Resource):
       logging.info('Received Signature-256: %s', data['Signature-256'])
       logging.info('Expected Signature-256: %s', hmac_obj.hexdigest())
       return {'message': 'The Signature-256 is not correct'}, 401
+    
+    data_envs = data['envs']
+    envs = []
+    for env_string in data_envs:
+      parts = env_string.split("=")
+      if len(parts) > 2:
+        env = EnvironmentModel(parts[0], parts[0], parts[1])
+        envs.append(env)
+      else:
+        logging.info("Ignored the following string because without '=' %s", env_string)
 
     settings = SettingModel.find_by_name('scm_url')
     for setting in settings:
@@ -46,7 +61,7 @@ class GenericExternal(Resource):
           return {'message': 'Setting is not associate to any project'}, 500
         execution = ExecutionModel(project_id=project_ids[0].project_id)
         try:
-          execution.exec()
+          execution.exec(supplement_envs=envs)
         except Exception as e:
           logging.error(repr(e))
           return {"message": "An error occurred running the item: %s" % repr(e)}, 500

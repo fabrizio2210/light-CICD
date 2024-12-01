@@ -11,7 +11,6 @@ from datetime import datetime
 from models.project_environment_map import ProjectEnvironmentMap
 from models.project_setting_map import ProjectSettingMap
 from models.main_setting import MainSettingModel
-from models.environment import EnvironmentModel
 from models.setting import SettingModel
 from models.redis import RedisModel
 from go.internal.proto.executor import executor_pb2
@@ -72,7 +71,7 @@ class ExecutionModel():
             'stop_time': self.stop_time}
 
   # Execute a run: creation of the environment, git clone, execution of CICD.sh(in container), make the output available
-  def exec(self, manual = None):
+  def exec(self, manual = None, supplement_envs = None):
     # Get Main Settings and Project Settings
     main_settings = MainSettingModel.get_all_settings()
     project_settings = ProjectSettingMap.get_settings_by_project_id(self.project_id)
@@ -124,6 +123,12 @@ class ExecutionModel():
       v.name = env.name
       v.value = env.value
       e.environment_variable.append(v)
+    if supplement_envs:
+      for env in supplement_envs:
+        v = executor_pb2.EnvironmentVariable()
+        v.name = env.name
+        v.value = env.value
+        e.environment_variable.append(v)
     for capability in docker_capabilities.value.split(","):
       if capability != "":
         e.docker_capability.append(capability)
