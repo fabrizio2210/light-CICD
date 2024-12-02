@@ -11,4 +11,6 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/${DOCKERARCH}/do
 
 RUN go install github.com/githubnemo/CompileDaemon@latest
 
+RUN groupadd -g 995 docker -r && usermod -a -G docker www-data
+
 CMD CompileDaemon -command="./executor"
