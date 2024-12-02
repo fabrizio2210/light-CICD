@@ -15,5 +15,6 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/${DOCKERARCH}/do
 RUN go build
 
 RUN groupadd -g 992 docker -r && usermod -a -G docker www-data
+RUN groupadd -g 995 docker-alt -r && usermod -a -G docker-alt www-data
 
 CMD ./executor
