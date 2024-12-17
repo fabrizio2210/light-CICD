@@ -43,15 +43,16 @@ class GenericExternal(Resource):
       logging.info('Expected Signature-256: %s', hmac_obj.hexdigest())
       return {'message': 'The Signature-256 is not correct'}, 401
     
-    data_envs = data['envs']
     envs = []
-    for env_string in data_envs:
-      parts = env_string.split("=")
-      if len(parts) > 1:
-        env = EnvironmentModel(parts[0], parts[0], parts[1])
-        envs.append(env)
-      else:
-        logging.info("Ignored the following string because without '=' %s", env_string)
+    data_envs = data['envs']
+    if data_envs:
+      for env_string in data_envs:
+        parts = env_string.split("=")
+        if len(parts) > 1:
+          env = EnvironmentModel(parts[0], parts[0], parts[1])
+          envs.append(env)
+        else:
+          logging.info("Ignored the following string because without '=' %s", env_string)
 
     settings = SettingModel.find_by_name('scm_url')
     for setting in settings:
