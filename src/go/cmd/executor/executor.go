@@ -138,7 +138,7 @@ func WaitForJob(ctx context.Context, executor Executor, fs Writer) error {
 	if err != nil {
 		return err
 	}
-	go WaitForExecution(cmd, execution, executor, fs)
+	WaitForExecution(cmd, execution, executor, fs)
 	return nil
 }
 
