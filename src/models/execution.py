@@ -201,6 +201,9 @@ class ExecutionModel():
               settings = settings,
               commandline = commandline)
       executions.append(execution)
+    for e in cls.find_executions_in_queue_by_project_id(project_id):
+      if e.id == f"{id:0>20}":
+        executions.append(e)
     return executions
   
   @classmethod

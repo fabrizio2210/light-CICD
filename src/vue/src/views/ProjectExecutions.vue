@@ -113,6 +113,9 @@ export default {
       dispatch("executions/executing", { project_id });
     },
     convertDate(timestamp) {
+      if (!timestamp) {
+        return "Not started yet"
+      }
       var myDate = new Date(timestamp * 1000);
       return myDate.toLocaleString();
     },

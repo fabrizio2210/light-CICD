@@ -40,7 +40,7 @@ export const executions = {
         execution => {
           commit("getSuccess", { execution, project_id });
         },
-        error => commit("getFailure", error)
+        error => commit("getFailure", project_id, error)
       );
     }
   },
@@ -113,8 +113,8 @@ export const executions = {
       );
       Vue.delete(state.all.executions_dicts[p.project_id], "loading");
     },
-    getFailure(state, error) {
-      state.all = { error };
+    getFailure(state, project_id, error) {
+      Vue.set(state.all.executions_dicts, project_id, { error: error });
     }
   }
 };
