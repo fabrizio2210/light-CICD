@@ -161,7 +161,6 @@ class ExecutionModel():
     executions = []
     for msg in RedisModel.peek_queue("executions"):
       e = text_format.Parse(msg, executor_pb2.Execution())
-      logging.info("found: '%s', asking: '%s'", e.project_id, project_id)
       if e.project_id != str(project_id):
         continue
       execution = ExecutionModel(project_id = project_id, 
