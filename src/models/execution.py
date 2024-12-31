@@ -95,13 +95,6 @@ class ExecutionModel():
         raise ValueError("Docker Image not set")
       docker_image.value = default_docker_image.value
 
-    # Throthling execution
-    if parallel_execs_per_project_host.value is not None:
-      count = ExecutionModel.getRunningExecutionByProject(self.project_id)
-      if count > parallel_execs_per_project_host.value - 1:
-        logging.warning("Too many executions (%d), limiting" % count)
-        raise RuntimeError("Too many executions (%d), limiting" % count)
-
     # Cleaning old executions
     ExecutionModel.keepLastExecutions(self.project_id)
 
@@ -279,19 +272,5 @@ class ExecutionModel():
     #TODO do a more robust approach
     return int("{}{:0>6}".format(int(datetime.now().timestamp()), random.randrange(100000)))
 
-  @classmethod
-  def getRunningExecutionByProject(cls, project_id):
-    count = 0
-    for proc in psutil.process_iter():
-      try:
-        if "docker" in proc.cmdline():
-          if "run" in proc.cmdline():
-            for arg in proc.cmdline():
-              if f"/{project_id}/" in arg:
-                count += 1
-                break
-      except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
-        pass
-    return count
 
 
