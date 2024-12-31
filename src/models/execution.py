@@ -247,7 +247,8 @@ class ExecutionModel():
   @classmethod
   def keepLastExecutions(cls, project_id):
     executions = cls.find_executions_by_project_id(project_id)
-    executions.sort(key=lambda e: e.start_time, reverse=True)
+    real_executions = [i for i in executions if i.start_time is not None]
+    real_executions.sort(key=lambda e: e.start_time, reverse=True)
 
     number_of_executions_to_keep = ProjectSettingMap.get_project_setting_by_name(project_id,
                                                                                  "number_of_executions_to_keep")
@@ -255,7 +256,7 @@ class ExecutionModel():
       number_of_executions_to_keep = MainSettingModel.get_setting_by_name("number_of_executions_to_keep")
 
     if number_of_executions_to_keep:
-      for e in executions[number_of_executions_to_keep[0].value-1:]:
+      for e in real_executions[number_of_executions_to_keep[0].value-1:]:
         logging.info("Deleting %d execution of %d.", e.id, project_id)
         cls.delete_by_id_and_project_id(e.id, project_id)
 
