@@ -434,7 +434,8 @@ class TestAPI_ExecutionAsUser(unittest.TestCase):
       # GET             /api/v1/project/1/executions
       # POST            /api/v1/project/1/new_execution
   @patch("models.redis.RedisModel.enque")
-  def test_050_get_execution_project(self, mock):
+  @patch("models.redis.RedisModel.peek_queue")
+  def test_050_get_execution_project(self, mock_enque, mock_peek):
     self.app = app.app.test_client()
     prj_name = "my_prj_name"
     prj_name2 = "my_prj_name2"

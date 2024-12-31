@@ -11,3 +11,7 @@ class RedisModel():
   @classmethod
   def enque(cls, queue, msg):
     cls.client.rpush(queue, msg)
+
+  @classmethod
+  def peek_queue(cls, queue):
+    return cls.client.lrange(queue, 0, -1)

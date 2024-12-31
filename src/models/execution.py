@@ -153,7 +153,20 @@ class ExecutionModel():
           potential_executions = cls.find_by_id_and_project_id(exec_id, project_id)
           if potential_executions:
             executions.append(potential_executions[0])
-      
+    executions.extend(cls.find_executions_in_queue_by_project_id(project_id))
+    return executions
+
+  @classmethod
+  def find_executions_in_queue_by_project_id(cls, project_id):
+    executions = []
+    for msg in RedisModel.peek_queue("executions"):
+      e = text_format.Parse(msg, executor_pb2.Execution())
+      logging.info("found: '%s', asking: '%s'", e.project_id, project_id)
+      if e.project_id != str(project_id):
+        continue
+      execution = ExecutionModel(project_id = project_id, 
+                                 id = e.id)
+      executions.append(execution)
     return executions
 
   @classmethod
