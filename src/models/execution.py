@@ -172,7 +172,10 @@ class ExecutionModel():
         rc = int(cls.readAttribute(exec_dir, "rc"))
       except:
         rc = None
-      start_time = int(cls.readAttribute(exec_dir, "start_time"))
+      try:
+        start_time = int(cls.readAttribute(exec_dir, "start_time"))
+      except:
+        start_time = None
       try:
         stop_time = int(cls.readAttribute(exec_dir, "stop_time"))
       except:
