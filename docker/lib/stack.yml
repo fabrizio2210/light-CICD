@@ -57,6 +57,8 @@ services:
 
   flask:
     image: fabrizio2210/light_cicd-backend
+    environment:
+      REDIS_HOST: light_redis
     labels: 
       traefik.port: 80
       traefik.enable: "true"
@@ -72,7 +74,7 @@ services:
   executor:
     image: fabrizio2210/light_cicd-executor
     environment:
-      REDIS_HOST: redis
+      REDIS_HOST: light_redis
       PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
       PROJECTS_PATH: "/opt/data/projects"
     volumes:
@@ -81,7 +83,7 @@ services:
     networks:
       - backends
 
-  redis:
+  light_redis:
     image: redis
     networks:
       - backends

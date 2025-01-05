@@ -199,7 +199,11 @@ func WaitForExecution(cmd *exec.Cmd, e *epb.Execution, executor Executor, file W
 
 func main() {
 	log.Println("This is an executor")
-	rediswrapper.RedisClient = rediswrapper.ConnectRedis("redis:6379")
+	redisHost := os.Getenv("REDIS_HOST")
+	if redisHost == "" {
+		redisHost = "redis"
+	}
+	rediswrapper.RedisClient = rediswrapper.ConnectRedis(redisHost + ":6379")
 	log.Printf("Redis client: %+v\n", rediswrapper.RedisClient)
 	docker := &Docker{}
 	docker.projects_dir = os.Getenv("PROJECTS_PATH")

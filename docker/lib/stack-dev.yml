@@ -69,6 +69,7 @@ services:
       traefik.http.routers.backend.rule: "PathPrefix(`/api`)"
     environment:
       DEBUG: 1
+      REDIS_HOST: light_redis
       WEBHOOK_SECRET: dfc448942b9d1496ceeaf7f3e8ba50a6cbab126f
       PROJECTS_PATH: "/opt/data/projects"
       PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
@@ -81,7 +82,7 @@ services:
   executor:
     image: fabrizio2210/light_cicd-executor-dev
     environment:
-      REDIS_HOST: redis
+      REDIS_HOST: light_redis
       PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
       PROJECTS_PATH: "/opt/data/projects"
     volumes:
@@ -91,7 +92,7 @@ services:
     networks:
       - backends
 
-  redis:
+  light_redis:
     image: redis
     networks:
       - backends
