@@ -140,6 +140,7 @@ class ExecutionModel():
     for w in in_queue:
       if is_exec_equal(w, e):
         already_present = True
+        break
 
     if already_present:
       logging.info("A similar execution is already in queue, dropping.")
