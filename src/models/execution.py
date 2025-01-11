@@ -134,7 +134,7 @@ class ExecutionModel():
         e.docker_capability.append(capability)
     e.manual = manual == True
 
-    # Load shed if the execution is already in the queue.
+    # Deduplicate executions in the queue.
     already_present = False
     in_queue = ExecutionModel.find_protos_in_queue_by_project_id(self.project_id)
     for w in in_queue:
