@@ -18,9 +18,13 @@ from google.protobuf import text_format
 from shlex import quote
 
 def is_exec_equal(a: executor_pb2.Execution, b: executor_pb2.Execution)-> bool:
-  a.id = "0"
-  b.id = "0"
-  if text_format.MessageToString(a) != text_format.MessageToString(b):
+  new_a = executor_pb2.Execution()
+  new_b = executor_pb2.Execution()
+  new_a.CopyFrom(a)
+  new_b.CopyFrom(b)
+  new_a.id = "0"
+  new_b.id = "0"
+  if text_format.MessageToString(new_a) != text_format.MessageToString(new_b):
     return False
   return True
 
