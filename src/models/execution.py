@@ -17,6 +17,13 @@ from go.internal.proto.executor import executor_pb2
 from google.protobuf import text_format
 from shlex import quote
 
+def is_exec_equal(a: executor_pb2.Execution, b: executor_pb2.Execution)-> bool:
+  a.id = "0"
+  b.id = "0"
+  if text_format.MessageToString(a) != text_format.MessageToString(b):
+    return False
+  return True
+
 def preexec_function():
   # Protect the the external execution from SIGHUP
   signal.signal(signal.SIGHUP, signal.SIG_IGN)
@@ -126,6 +133,17 @@ class ExecutionModel():
       if capability != "":
         e.docker_capability.append(capability)
     e.manual = manual == True
+
+    # Load shed if the execution is already in the queue.
+    already_present = False
+    in_queue = ExecutionModel.find_protos_in_queue_by_project_id(self.project_id)
+    for w in in_queue:
+      if is_exec_equal(w, e):
+        already_present = True
+
+    if already_present:
+      logging.info("A similar execution is already in queue, dropping.")
+      raise RuntimeError("A similar execution is already in queue, dropping.")
     RedisModel.enque("executions", text_format.MessageToString(e))
 
   @classmethod
@@ -160,6 +178,16 @@ class ExecutionModel():
                                  id = e.id)
       executions.append(execution)
     return executions
+  
+  @classmethod
+  def find_protos_in_queue_by_project_id(cls, project_id):
+    protos = []
+    for msg in RedisModel.peek_queue("executions"):
+      e = text_format.Parse(msg, executor_pb2.Execution())
+      if e.project_id != str(project_id):
+        continue
+      protos.append(e)
+    return protos
 
   @classmethod
   def find_by_id_and_project_id(cls, id, project_id):
