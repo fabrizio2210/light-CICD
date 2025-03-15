@@ -130,8 +130,8 @@ class ExecutionModel():
     if supplement_envs:
       for env in supplement_envs:
         v = executor_pb2.EnvironmentVariable()
-        v.name = env.name
-        v.value = env.value
+        v.name = str(env.name)
+        v.value = str(env.value)
         e.environment_variable.append(v)
     for capability in docker_capabilities.value.split(","):
       if capability != "":
