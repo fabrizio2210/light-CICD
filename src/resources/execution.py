@@ -76,7 +76,7 @@ class NewExecution(Resource):
     try:
       execution.exec(manual=True)
     except Exception as e:
-      logging.error(repr(e))
+      logging.error("%s: %s" % (repr(e), traceback.format_exc()))
       return {"message": "Error doing the execution: %s: %s" % (repr(e), traceback.format_exc())}, 500
 
     return { 'execution': execution.json()}, 201
