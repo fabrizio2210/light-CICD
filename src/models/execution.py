@@ -124,8 +124,8 @@ class ExecutionModel():
     e.docker_image = docker_image.value
     for env in ProjectEnvironmentMap.get_environments_by_project_id(self.project_id):
       v = executor_pb2.EnvironmentVariable()
-      v.name = env.name
-      v.value = env.value
+      v.name = str(env.name)
+      v.value = str(env.value)
       e.environment_variable.append(v)
     if supplement_envs:
       for env in supplement_envs:
