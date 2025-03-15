@@ -1,4 +1,5 @@
 import logging
+import traceback
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from models.execution import ExecutionModel
@@ -76,6 +77,6 @@ class NewExecution(Resource):
       execution.exec(manual=True)
     except Exception as e:
       logging.error(repr(e))
-      return {"message": "Error doing the execution: %s." % repr(e)}, 500
+      return {"message": "Error doing the execution: %s: %s" % (repr(e), traceback.format_exc())}, 500
 
     return { 'execution': execution.json()}, 201
