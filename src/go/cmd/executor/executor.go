@@ -28,6 +28,7 @@ type Executor interface {
 type Docker struct {
 	projects_dir           string
 	projects_volume_string string
+	attachable_network     string
 }
 
 func (d *Docker) ProjectDir(e *epb.Execution) string {
@@ -64,10 +65,16 @@ func (d *Docker) Run(e *epb.Execution, output io.Writer, file Writer) (*exec.Cmd
 	command_array = append(command_array, "--env", "PROJECT_REPOSITORY="+d.ProjectRepoDir(e))
 	command_array = append(command_array, "--env", "REPOSITORY="+d.CentralRepoDir())
 	command_array = append(command_array, "--env", "PROJECTS_VOLUME_STRING="+d.projects_volume_string)
+	if d.attachable_network != "" {
+		command_array = append(command_array, "--env", "LIGHTCICD_ATTACHABLE_NETWORK="+d.attachable_network)
+	}
 	for _, v := range e.GetEnvironmentVariable() {
 		command_array = append(command_array, "--env", v.GetName()+"="+v.GetValue())
 	}
 	command_array = append(command_array, "--pull", "always")
+	if d.attachable_network != "" {
+		command_array = append(command_array, "--network", d.attachable_network)
+	}
 	if d.projects_volume_string != "" {
 		command_array = append(command_array, "-v", d.projects_volume_string)
 	}
@@ -208,6 +215,7 @@ func main() {
 	docker := &Docker{}
 	docker.projects_dir = os.Getenv("PROJECTS_PATH")
 	docker.projects_volume_string = os.Getenv("PROJECTS_VOLUME_STRING")
+	docker.attachable_network = os.Getenv("LIGHTCICD_ATTACHABLE_NETWORK")
 	ctx := context.Background()
 	fs := &Filesystem{}
 	for {

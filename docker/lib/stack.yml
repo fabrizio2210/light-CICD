@@ -77,6 +77,7 @@ services:
       REDIS_HOST: light_redis
       PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
       PROJECTS_PATH: "/opt/data/projects"
+      LIGHTCICD_ATTACHABLE_NETWORK: "${LIGHTCICD_ATTACHABLE_NETWORK:-light_cicd_backends}"
     volumes:
       - temp_projects_dir:/opt/data
       - /var/run/docker.sock:/var/run/docker.sock
@@ -91,6 +92,7 @@ services:
 networks:
   backends:
     driver: overlay
+    attachable: true
 
 volumes:
   temp_projects_dir:

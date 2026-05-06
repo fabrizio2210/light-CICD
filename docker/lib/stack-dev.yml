@@ -85,6 +85,7 @@ services:
       REDIS_HOST: light_redis
       PROJECTS_VOLUME_STRING: "temp_projects_dir:/opt/data"
       PROJECTS_PATH: "/opt/data/projects"
+      LIGHTCICD_ATTACHABLE_NETWORK: "${LIGHTCICD_ATTACHABLE_NETWORK:-light_cicd_dev_backends}"
     volumes:
       - ../../src/go:/usr/src/app
       - temp_projects_dir:/opt/data

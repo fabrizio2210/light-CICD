@@ -58,6 +58,7 @@ func TestRunDocker(t *testing.T) {
 	runner := &Docker{}
 	runner.projects_dir = "/opt/data/projects"
 	runner.projects_volume_string = "temp_projects_dir:/opt/data"
+	runner.attachable_network = "light_cicd_dev_backends"
 	fs := &fakeWriter{}
 	cmd, err := runner.Run(input, os.Stdout, fs)
 	if err != nil {
@@ -83,8 +84,10 @@ func TestHelperProcess(t *testing.T) {
 		"--env", "PROJECT_REPOSITORY=/opt/data/projects/222/repo",
 		"--env", "REPOSITORY=/opt/data/projects/repo",
 		"--env", "PROJECTS_VOLUME_STRING=temp_projects_dir:/opt/data",
+		"--env", "LIGHTCICD_ATTACHABLE_NETWORK=light_cicd_dev_backends",
 		"--env", "VAR=value",
 		"--pull", "always",
+		"--network", "light_cicd_dev_backends",
 		"-v", "temp_projects_dir:/opt/data",
 		"-v", "/var/run/docker.sock:/var/run/docker.sock",
 		"--cap-add", "CAPABILITY",
